@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:registry_pull/routes.dart';
+import 'package:routefly/routefly.dart';
 
 class MuscleTitle extends StatelessWidget {
   const MuscleTitle({super.key, required this.title});
@@ -16,6 +18,9 @@ class MuscleTitle extends StatelessWidget {
           title,
           textAlign: TextAlign.center,
         ),
+        onTap: () {
+          Routefly.pushNavigate(routePaths.exercises);
+        },
         titleTextStyle: const TextStyle(
           fontWeight: FontWeight.w700,
           fontSize: 20,
