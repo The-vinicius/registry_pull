@@ -11,8 +11,8 @@ class MuscleTitle extends StatelessWidget {
     return Container(
       width: MediaQuery.of(context).size.width * .8,
       decoration: const BoxDecoration(
-          color: Colors.orangeAccent,
-          borderRadius: BorderRadius.all(Radius.circular(16))),
+          color: Colors.lightBlue,
+          borderRadius: BorderRadius.all(Radius.circular(10))),
       child: ListTile(
         title: Text(
           title,
@@ -24,7 +24,7 @@ class MuscleTitle extends StatelessWidget {
         titleTextStyle: const TextStyle(
           fontWeight: FontWeight.w700,
           fontSize: 20,
-          color: Colors.blue,
+          color: Colors.white,
         ),
       ),
     );
