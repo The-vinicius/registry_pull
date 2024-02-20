@@ -8,6 +8,7 @@ class AppRegistry extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       title: 'Registry pull',
       routerConfig:
           Routefly.routerConfig(routes: routes, initialPath: routePaths.splash),
