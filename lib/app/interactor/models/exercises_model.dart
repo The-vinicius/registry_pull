@@ -5,15 +5,17 @@ part 'exercises_model.g.dart';
 
 @JsonSerializable()
 class ExercisesModel {
-  final int id;
+  final String id;
   final String nameMuscle;
   final String nameExercise;
+  final bool isExpanded;
   final List<DayExerciseModel?> days;
 
   ExercisesModel({
     required this.id,
     required this.nameMuscle,
     required this.nameExercise,
+    this.isExpanded = false,
     required this.days,
   });
 
@@ -23,15 +25,17 @@ class ExercisesModel {
   Map<String, dynamic> toJson() => _$ExercisesModelToJson(this);
 
   ExercisesModel copyWith({
-    int? id,
+    String? id,
     String? nameMuscle,
     String? nameExercise,
+    bool? isExpanded,
     List<DayExerciseModel?>? days,
   }) {
     return ExercisesModel(
       id: id ?? this.id,
       nameMuscle: nameMuscle ?? this.nameMuscle,
       nameExercise: nameExercise ?? this.nameExercise,
+      isExpanded: isExpanded ?? this.isExpanded,
       days: days ?? this.days,
     );
   }
