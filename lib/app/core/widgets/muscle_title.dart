@@ -19,7 +19,7 @@ class MuscleTitle extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         onTap: () {
-          Routefly.pushNavigate(routePaths.exercises);
+          Routefly.pushNavigate(routePaths.exercises, arguments: title);
         },
         titleTextStyle: const TextStyle(
           fontWeight: FontWeight.w700,
