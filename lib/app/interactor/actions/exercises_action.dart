@@ -21,3 +21,8 @@ deleteExercise(String id, String muscle) async {
   await repository.deleteExercise(id, muscle);
   await getExercises(muscle);
 }
+
+void putDay(ExercisesModel model) async {
+  final repository = injector.get<ExercisesRepository>();
+  await repository.insertDayExercise(model);
+}
