@@ -1,7 +1,9 @@
 import 'package:asp/asp.dart';
 import 'package:flutter/material.dart';
+import 'package:registry_pull/app/core/widgets/list_date.dart';
 import 'package:registry_pull/app/interactor/actions/exercises_action.dart';
 import 'package:registry_pull/app/interactor/atoms/exercise_atom.dart';
+import 'package:registry_pull/app/interactor/models/day_exercise_model.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
 import 'package:routefly/routefly.dart';
 
@@ -14,6 +16,7 @@ class ExercisesPage extends StatefulWidget {
 
 class _ExercisesPageState extends State<ExercisesPage> {
   final muscle = Routefly.query.arguments;
+  final daysState = Days(0);
 
   @override
   void initState() {
@@ -151,55 +154,33 @@ class _ExercisesPageState extends State<ExercisesPage> {
                                             'Data',
                                             textAlign: TextAlign.left,
                                           ),
-                                          Row(
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.all(5),
-                                                margin: const EdgeInsets.only(
-                                                    right: 5),
-                                                decoration: const BoxDecoration(
-                                                    color:
-                                                        Colors.lightBlueAccent,
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                10))),
-                                                width: 60,
-                                                height: 30,
-                                                child: const Text(
-                                                  '20/02',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.all(5),
-                                                margin: const EdgeInsets.only(
-                                                    right: 5),
-                                                decoration: const BoxDecoration(
-                                                    color:
-                                                        Colors.lightBlueAccent,
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                10))),
-                                                width: 60,
-                                                height: 30,
-                                                child: const Text(
-                                                  '20/02',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                              IconButton(
-                                                  onPressed: () {},
-                                                  icon: const Icon(
-                                                      Icons.add_circle_outline))
-                                            ],
+                                          SingleChildScrollView(
+                                            reverse: true,
+                                            scrollDirection: Axis.horizontal,
+                                            child: ValueListenableBuilder(
+                                                valueListenable: daysState,
+                                                builder:
+                                                    (context, valor, widget) {
+                                                  return Row(
+                                                    children: [
+                                                      ...listDate(e.days),
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            e.days.add(
+                                                                DayExerciseModel(
+                                                                    id: 1,
+                                                                    date: DateTime
+                                                                        .now(),
+                                                                    series: []));
+                                                            daysState
+                                                                .increment();
+                                                            putDay(e);
+                                                          },
+                                                          icon: const Icon(Icons
+                                                              .add_circle_outline))
+                                                    ],
+                                                  );
+                                                }),
                                           ),
                                           const SizedBox(
                                             height: 10,
@@ -226,27 +207,6 @@ class _ExercisesPageState extends State<ExercisesPage> {
                                                 height: 30,
                                                 child: const Text(
                                                   '1',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.all(5),
-                                                margin: const EdgeInsets.only(
-                                                    right: 5),
-                                                decoration: const BoxDecoration(
-                                                    color:
-                                                        Colors.lightBlueAccent,
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                10))),
-                                                width: 30,
-                                                height: 30,
-                                                child: const Text(
-                                                  '2',
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                       color: Colors.white),
