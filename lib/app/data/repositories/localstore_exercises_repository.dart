@@ -29,8 +29,9 @@ class LocalstoreExercisesRepository implements ExercisesRepository {
   }
 
   @override
-  Future<DayExerciseModel> insertDayExercise(DayExerciseModel model) {
-    throw UnimplementedError();
+  Future<DayExerciseModel> insertDayExercise(ExercisesModel model) async {
+    await db.collection(model.nameMuscle).doc(model.id).set(model.toJson());
+    return model.days.last!;
   }
 
   @override
