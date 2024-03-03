@@ -1,10 +1,12 @@
 import 'package:asp/asp.dart';
 import 'package:flutter/material.dart';
 import 'package:registry_pull/app/core/widgets/list_date.dart';
+import 'package:registry_pull/app/core/widgets/list_series.dart';
 import 'package:registry_pull/app/interactor/actions/exercises_action.dart';
 import 'package:registry_pull/app/interactor/atoms/exercise_atom.dart';
 import 'package:registry_pull/app/interactor/models/day_exercise_model.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
+import 'package:registry_pull/app/interactor/models/series_model.dart';
 import 'package:routefly/routefly.dart';
 
 class ExercisesPage extends StatefulWidget {
@@ -14,7 +16,11 @@ class ExercisesPage extends StatefulWidget {
   State<ExercisesPage> createState() => _ExercisesPageState();
 }
 
-class _ExercisesPageState extends State<ExercisesPage> {
+final indexSeries = SeriesIndex(0);
+final indexRepps = SeriesIndex(0);
+
+class _ExercisesPageState extends State<ExercisesPage>
+    with SingleTickerProviderStateMixin {
   final muscle = Routefly.query.arguments;
   final daysState = Days(0);
 
@@ -53,6 +59,36 @@ class _ExercisesPageState extends State<ExercisesPage> {
               onPressed: () {
                 putExercises(model!);
                 Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<int?> addserie(int repps) async {
+    return showDialog<int>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Adicionar Exercício'),
+          content: TextFormField(
+            onChanged: (value) {
+              repps = int.parse(value);
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(repps);
               },
               child: const Text('Save'),
             ),
@@ -112,6 +148,8 @@ class _ExercisesPageState extends State<ExercisesPage> {
       ),
       body: RxBuilder(builder: (context) {
         final exercises = exerciseState.value;
+        indexRepps.value = 0;
+        indexSeries.value = 0;
         return exercises.isEmpty
             ? const Center(
                 child: Text(
@@ -166,18 +204,21 @@ class _ExercisesPageState extends State<ExercisesPage> {
                                                       ...listDate(e.days),
                                                       IconButton(
                                                           onPressed: () {
-                                                            e.days.add(
-                                                                DayExerciseModel(
-                                                                    id: 1,
-                                                                    date: DateTime
-                                                                        .now(),
-                                                                    series: []));
+                                                            e.days.add(DayExerciseModel(
+                                                                id: e.days
+                                                                        .isEmpty
+                                                                    ? 0
+                                                                    : e.days
+                                                                        .length,
+                                                                date: DateTime
+                                                                    .now(),
+                                                                series: []));
                                                             daysState
                                                                 .increment();
                                                             putDay(e);
                                                           },
                                                           icon: const Icon(Icons
-                                                              .add_circle_outline))
+                                                              .add_circle_outline)),
                                                     ],
                                                   );
                                                 }),
@@ -189,74 +230,87 @@ class _ExercisesPageState extends State<ExercisesPage> {
                                             'Series',
                                             textAlign: TextAlign.left,
                                           ),
-                                          Row(
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.all(5),
-                                                margin: const EdgeInsets.only(
-                                                    right: 5),
-                                                decoration: const BoxDecoration(
-                                                    color:
-                                                        Colors.lightBlueAccent,
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                10))),
-                                                width: 30,
-                                                height: 30,
-                                                child: const Text(
-                                                  '1',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
+                                          if (e.days.isNotEmpty) ...[
+                                            SingleChildScrollView(
+                                              reverse: true,
+                                              scrollDirection: Axis.horizontal,
+                                              child: ValueListenableBuilder(
+                                                  valueListenable: indexSeries,
+                                                  builder:
+                                                      (context, valor, widget) {
+                                                    final series = e
+                                                        .days[
+                                                            indexSeries.value]!
+                                                        .series;
+
+                                                    return Row(
+                                                      children: [
+                                                        ...listSeries(series),
+                                                        IconButton(
+                                                            onPressed:
+                                                                () async {
+                                                              final repps =
+                                                                  await addserie(
+                                                                      0);
+                                                              if (repps !=
+                                                                  null) {
+                                                                e.days[indexSeries.value]!.series.add(SeriesModel(
+                                                                    series: series
+                                                                            .isEmpty
+                                                                        ? 0
+                                                                        : series
+                                                                            .length,
+                                                                    repetitions:
+                                                                        repps));
+                                                                indexSeries
+                                                                    .increment();
+
+                                                                putDay(e);
+                                                              }
+                                                            },
+                                                            icon: const Icon(Icons
+                                                                .add_circle_outline)),
+                                                      ],
+                                                    );
+                                                  }),
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            const Text('Repetições'),
+                                            if (e.days[indexSeries.value]!
+                                                .series.isNotEmpty)
+                                              SingleChildScrollView(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                child: ValueListenableBuilder(
+                                                    valueListenable: indexRepps,
+                                                    builder: (context, valor,
+                                                        widget) {
+                                                      final repps = e
+                                                          .days[indexSeries
+                                                              .value]!
+                                                          .series[
+                                                              indexRepps.value]
+                                                          .repetitions;
+
+                                                      return Row(
+                                                        children: List.generate(
+                                                          repps,
+                                                          (index) => Container(
+                                                            margin:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    right: 5),
+                                                            height: 50,
+                                                            width: 10,
+                                                            color: Colors.red,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }),
                                               ),
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          const Text('Repetições: 5'),
-                                          Row(
-                                            children: [
-                                              Container(
-                                                margin: const EdgeInsets.only(
-                                                    right: 5),
-                                                height: 50,
-                                                width: 10,
-                                                color: Colors.red,
-                                              ),
-                                              Container(
-                                                margin: const EdgeInsets.only(
-                                                    right: 5),
-                                                height: 50,
-                                                width: 10,
-                                                color: Colors.red,
-                                              ),
-                                              Container(
-                                                margin: const EdgeInsets.only(
-                                                    right: 5),
-                                                height: 50,
-                                                width: 10,
-                                                color: Colors.red,
-                                              ),
-                                              Container(
-                                                margin: const EdgeInsets.only(
-                                                    right: 5),
-                                                height: 50,
-                                                width: 10,
-                                                color: Colors.red,
-                                              ),
-                                              Container(
-                                                margin: const EdgeInsets.only(
-                                                    right: 5),
-                                                height: 50,
-                                                width: 10,
-                                                color: Colors.red,
-                                              ),
-                                            ],
-                                          ),
+                                          ],
                                         ]),
                                   ),
                                 ),
