@@ -12,3 +12,11 @@ class Days extends ValueNotifier<int> {
     notifyListeners();
   }
 }
+
+class SeriesIndex extends ValueNotifier<int> {
+  SeriesIndex(int value) : super(value);
+
+  void increment() {
+    notifyListeners();
+  }
+}
