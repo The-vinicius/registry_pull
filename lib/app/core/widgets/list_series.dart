@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:registry_pull/app/(public)/exercises_page.dart';
-import 'package:registry_pull/app/interactor/models/day_exercise_model.dart';
+import 'package:registry_pull/app/interactor/models/series_model.dart';
 
-List<Widget> listDate(List<DayExerciseModel?> days) {
-  return days
+List<Widget> listSeries(List<SeriesModel?> series) {
+  return series
       .map(
         (e) => GestureDetector(
           onTap: () {
-            indexSeries.value = e!.id;
+            indexRepps.value = e!.series;
           },
           child: Container(
             padding: const EdgeInsets.all(5),
@@ -15,12 +15,12 @@ List<Widget> listDate(List<DayExerciseModel?> days) {
             decoration: const BoxDecoration(
                 color: Colors.lightBlueAccent,
                 borderRadius: BorderRadius.all(Radius.circular(10))),
-            width: 60,
+            width: 30,
             height: 30,
-            child: Text(
-              '${e?.date.day}/${e?.date.month}',
+            child: const Text(
+              '1',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white),
             ),
           ),
         ),
