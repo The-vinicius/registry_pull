@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:registry_pull/app/(public)/exercises_page.dart';
 import 'package:registry_pull/app/interactor/models/series_model.dart';
 
-List<Widget> listSeries(List<SeriesModel?> series) {
+List<Widget> listSeries(List<SeriesModel?> series, Function(int, bool) toggle) {
   return series
       .map(
         (e) => GestureDetector(
           onTap: () {
-            indexRepps.value = e!.series;
+            toggle(e!.series, false);
           },
           child: Container(
             padding: const EdgeInsets.all(5),

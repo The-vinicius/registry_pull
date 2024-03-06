@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:registry_pull/app/(public)/exercises_page.dart';
 import 'package:registry_pull/app/interactor/models/day_exercise_model.dart';
 
-List<Widget> listDate(List<DayExerciseModel?> days) {
+List<Widget> listDate(
+    List<DayExerciseModel?> days, Function(int, bool) toggle) {
   return days
       .map(
         (e) => GestureDetector(
           onTap: () {
-            indexSeries.value = e!.id;
+            toggle(e!.id, true);
           },
           child: Container(
             padding: const EdgeInsets.all(5),
