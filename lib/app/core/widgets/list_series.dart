@@ -6,7 +6,7 @@ List<Widget> listSeries(List<SeriesModel?> series, Function(int, bool) toggle) {
       .map(
         (e) => GestureDetector(
           onTap: () {
-            toggle(e!.series, false);
+            toggle(e.series, false);
           },
           child: Container(
             padding: const EdgeInsets.all(5),
@@ -16,10 +16,10 @@ List<Widget> listSeries(List<SeriesModel?> series, Function(int, bool) toggle) {
                 borderRadius: BorderRadius.all(Radius.circular(10))),
             width: 30,
             height: 30,
-            child: const Text(
-              '1',
+            child: Text(
+              '${e!.series + 1}',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         ),
