@@ -7,8 +7,14 @@ class LocalstoreExercisesRepository implements ExercisesRepository {
   final db = Localstore.instance;
 
   @override
-  Future<bool> deleteDayExercise(int id) {
-    throw UnimplementedError();
+  Future<bool> deleteDayExercise(
+      String nameMuscle, String id, List<DayExerciseModel?> days) async {
+    final map = days.map((e) => e?.toJson()).toList();
+    db
+        .collection(nameMuscle)
+        .doc(id)
+        .set({'days': map}, SetOptions(merge: true));
+    return true;
   }
 
   @override

@@ -6,5 +6,6 @@ abstract class ExercisesRepository {
   Future<ExercisesModel> insertExercise(ExercisesModel model);
   Future<DayExerciseModel> insertDayExercise(ExercisesModel model);
   Future<bool> deleteExercise(String id, String muscle);
-  Future<bool> deleteDayExercise(int id);
+  Future<bool> deleteDayExercise(
+      String muscle, String id, List<DayExerciseModel?> days);
 }
