@@ -25,6 +25,31 @@ class _ContainerExpandState extends State<ContainerExpand> {
   var indexSeries = 0;
   var indexRepps = 0;
 
+  Future<bool?> deleteDay() async {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Remover?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Deleta'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void toggleVibration(int index, bool serie) {
     setState(() {
       if (serie) {
@@ -63,13 +88,30 @@ class _ContainerExpandState extends State<ContainerExpand> {
               IconButton(
                   onPressed: () {
                     exercise.days.add(DayExerciseModel(
-                        id: exercise.days.isEmpty ? 0 : exercise.days.length,
+                        id: exercise.days.isEmpty
+                            ? 0
+                            : exercise.days.last!.id + 1,
                         date: DateTime.now(),
                         series: []));
                     putDay(exercise);
                     setState(() {});
                   },
-                  icon: const Icon(Icons.add_circle_outline))
+                  icon: const Icon(Icons.add_circle_outline)),
+              if (exercise.days.isNotEmpty)
+                IconButton(
+                    onPressed: () async {
+                      final del = await deleteDay();
+                      if (del == true) {
+                        exercise.days.removeLast();
+                        removeDay(
+                            exercise.nameMuscle, exercise.id, exercise.days);
+                        setState(() {
+                          indexSeries = 0;
+                          indexRepps = 0;
+                        });
+                      }
+                    },
+                    icon: const Icon(Icons.delete)),
             ],
           ),
         ),
@@ -98,7 +140,22 @@ class _ContainerExpandState extends State<ContainerExpand> {
                       }
                       setState(() {});
                     },
-                    icon: const Icon(Icons.add_circle_outlined))
+                    icon: const Icon(Icons.add_circle_outlined)),
+                if (exercise.days[indexSeries]!.series.isNotEmpty)
+                  IconButton(
+                      onPressed: () async {
+                        final del = await deleteDay();
+                        if (del == true) {
+                          exercise.days[indexSeries]!.series.removeLast();
+                          removeDay(
+                              exercise.nameMuscle, exercise.id, exercise.days);
+                          setState(() {
+                            indexSeries = 0;
+                            indexRepps = 0;
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.delete)),
               ],
             ),
           ),
