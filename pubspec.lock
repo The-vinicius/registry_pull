@@ -65,6 +65,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  brasil_datetime:
+    dependency: "direct main"
+    description:
+      name: brasil_datetime
+      sha256: a52b437a049bfdc56cf26bce1fb92234f423ae434d191597ba6c7b5e2d929a4e
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.2"
   build:
     dependency: transitive
     description:
@@ -291,6 +299,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+  intl:
+    dependency: transitive
+    description:
+      name: intl
+      sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.19.0"
   io:
     dependency: transitive
     description:

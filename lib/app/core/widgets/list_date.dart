@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:registry_pull/app/interactor/models/day_exercise_model.dart';
+import 'package:brasil_datetime/brasil_datetime.dart' as data;
 
 List<Widget> listDate(
     List<DayExerciseModel?> days, Function(int, bool) toggle) {
@@ -15,12 +16,14 @@ List<Widget> listDate(
             decoration: const BoxDecoration(
                 color: Colors.lightBlueAccent,
                 borderRadius: BorderRadius.all(Radius.circular(10))),
-            width: 60,
+            width: 80,
             height: 30,
-            child: Text(
-              '${e?.date.day}/${e?.date.month}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white),
+            child: Center(
+              child: Text(
+                '${e?.date.diaMesAbrev()}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
           ),
         ),
