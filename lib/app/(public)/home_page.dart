@@ -12,21 +12,21 @@ class HomePage extends StatelessWidget {
           width: MediaQuery.of(context).size.width,
           decoration: const BoxDecoration(
             image: DecorationImage(
-                image: AssetImage('assets/images/gym3.jpg'), fit: BoxFit.cover),
+                image: AssetImage('assets/images/gym2.jpg'), fit: BoxFit.cover),
           ),
           child: const Column(
             children: [
               Text(
-                'Treinos',
+                'TREINOS',
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 30,
-                  color: Colors.white70,
+                  color: Colors.white,
                   shadows: [
                     Shadow(
                         color: Colors.black87,
                         offset: Offset(0, 2),
-                        blurRadius: 4),
+                        blurRadius: 2),
                   ],
                 ),
               ),
