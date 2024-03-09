@@ -84,7 +84,7 @@ class _ContainerExpandState extends State<ContainerExpand> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              ...listDate(exercise.days, toggleVibration),
+              ...listDate(exercise.days, indexSeries, toggleVibration),
               IconButton(
                   onPressed: () {
                     exercise.days.add(DayExerciseModel(
@@ -125,8 +125,8 @@ class _ContainerExpandState extends State<ContainerExpand> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                ...listSeries(
-                    exercise.days[indexSeries]!.series, toggleVibration),
+                ...listSeries(exercise.days[indexSeries]!.series, indexRepps,
+                    toggleVibration),
                 IconButton(
                     onPressed: () async {
                       final repps = await widget.addserie(0);
