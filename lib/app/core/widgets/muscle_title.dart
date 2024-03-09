@@ -9,7 +9,7 @@ class MuscleTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * .8,
+      width: MediaQuery.of(context).size.width * .7,
       decoration: const BoxDecoration(
           color: Colors.lightBlue,
           borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -22,7 +22,7 @@ class MuscleTitle extends StatelessWidget {
           Routefly.pushNavigate(routePaths.exercises, arguments: title);
         },
         titleTextStyle: const TextStyle(
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w300,
           fontSize: 20,
           color: Colors.white,
         ),

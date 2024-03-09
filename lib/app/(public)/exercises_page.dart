@@ -65,8 +65,9 @@ class _ExercisesPageState extends State<ExercisesPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Adicionar Exercício'),
+          title: const Text('Total de repetições'),
           content: TextFormField(
+            keyboardType: TextInputType.phone,
             onChanged: (value) {
               repps = int.parse(value);
             },
@@ -149,15 +150,19 @@ class _ExercisesPageState extends State<ExercisesPage> {
                 ),
               )
             : SingleChildScrollView(
-                child: Column(
-                  children: exercises
-                      .map((exercise) => ContainerExpand(
-                            exercise: exercise,
-                            addserie: addserie,
-                            deleteDialog: deleteDialog,
-                          ))
-                      .toList(),
-                ),
+                child: loading.value
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : Column(
+                        children: exercises
+                            .map((exercise) => ContainerExpand(
+                                  exercise: exercise,
+                                  addserie: addserie,
+                                  deleteDialog: deleteDialog,
+                                ))
+                            .toList(),
+                      ),
               );
       }),
     );
