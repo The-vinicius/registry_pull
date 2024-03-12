@@ -1,5 +1,6 @@
 import 'package:routefly/routefly.dart';
 
+import 'app/(public)/exercises_page.dart' as a2;
 import 'app/(public)/home_page.dart' as a1;
 import 'app/(public)/splash_page.dart' as a0;
 
@@ -22,10 +23,20 @@ List<RouteEntity> get routes => [
       const a1.HomePage(),
     ),
   ),
+  RouteEntity(
+    key: '/exercises',
+    uri: Uri.parse('/exercises'),
+    routeBuilder: (ctx, settings) => Routefly.defaultRouteBuilder(
+      ctx,
+      settings,
+      const a2.ExercisesPage(),
+    ),
+  ),
 ];
 
 const routePaths = (
   path: '/',
   splash: '/splash',
   home: '/home',
+  exercises: '/exercises',
 );
