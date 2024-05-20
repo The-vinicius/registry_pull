@@ -1,6 +1,5 @@
 import 'package:registry_pull/app/injector.dart';
 import 'package:registry_pull/app/interactor/atoms/exercise_atom.dart';
-import 'package:registry_pull/app/interactor/models/day_exercise_model.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
 import 'package:registry_pull/app/interactor/repositories/exercises_repository.dart';
 
@@ -25,10 +24,10 @@ deleteExercise(String id, String muscle) async {
 
 void putDay(ExercisesModel model) async {
   final repository = injector.get<ExercisesRepository>();
-  await repository.insertDayExercise(model);
+  await repository.updateExercise(model);
 }
 
-void removeDay(String muscle, String id, List<DayExerciseModel?> days) async {
+void removeDay(ExercisesModel model) async {
   final repository = injector.get<ExercisesRepository>();
-  await repository.deleteDayExercise(muscle, id, days);
+  await repository.updateExercise(model);
 }

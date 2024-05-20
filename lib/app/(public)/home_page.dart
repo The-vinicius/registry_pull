@@ -34,19 +34,31 @@ class HomePage extends StatelessWidget {
               SizedBox(
                 height: 40,
               ),
-              MuscleTitle(title: 'Braços'),
+              MuscleTitle(
+                title: 'Braços',
+                key: Key('braços'),
+              ),
               SizedBox(
                 height: 20,
               ),
-              MuscleTitle(title: 'Peito'),
+              MuscleTitle(
+                title: 'Peito',
+                key: Key('peito'),
+              ),
               SizedBox(
                 height: 20,
               ),
-              MuscleTitle(title: 'Pernas'),
+              MuscleTitle(
+                title: 'Pernas',
+                key: Key('pernas'),
+              ),
               SizedBox(
                 height: 20,
               ),
-              MuscleTitle(title: 'Costas'),
+              MuscleTitle(
+                title: 'Costas',
+                key: Key('costas'),
+              ),
             ],
           ),
         ),

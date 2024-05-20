@@ -5,17 +5,14 @@ import 'package:registry_pull/app/interactor/actions/exercises_action.dart';
 import 'package:registry_pull/app/interactor/models/day_exercise_model.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
 import 'package:registry_pull/app/interactor/models/series_model.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 
 class ContainerExpand extends StatefulWidget {
   const ContainerExpand({
     super.key,
     required this.exercise,
-    required this.addserie,
-    required this.deleteDialog,
   });
   final ExercisesModel exercise;
-  final Function(int) addserie;
-  final Function(String, String, String) deleteDialog;
 
   @override
   State<ContainerExpand> createState() => _ContainerExpandState();
@@ -24,6 +21,9 @@ class ContainerExpand extends StatefulWidget {
 class _ContainerExpandState extends State<ContainerExpand> {
   var indexSeries = 0;
   var indexRepps = 0;
+
+  final _listController = ListController();
+  final ScrollController _scrollController = ScrollController();
 
   Future<bool?> deleteDay() async {
     return showDialog<bool>(
@@ -61,14 +61,28 @@ class _ContainerExpandState extends State<ContainerExpand> {
     });
   }
 
+  void jumpToItem(int index) {
+    _listController.jumpToItem(
+      index: index,
+      scrollController: _scrollController,
+      alignment: 0.5,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
 
     return ExpansionTile(
+      key: const Key('expansion'),
+      onExpansionChanged: (_) {
+        Future.delayed(const Duration(milliseconds: 200), () {
+          jumpToItem(exercise.days.length);
+        });
+      },
       childrenPadding: const EdgeInsets.all(10),
       title: GestureDetector(
-        onLongPress: () => widget.deleteDialog(
+        onLongPress: () => deleteDialog(
             exercise.id, exercise.nameMuscle, exercise.nameExercise),
         child: Text(exercise.nameExercise),
       ),
@@ -79,41 +93,33 @@ class _ContainerExpandState extends State<ContainerExpand> {
           height: 20,
         ),
         const Text('Data'),
-        SingleChildScrollView(
-          reverse: true,
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              ...listDate(exercise.days, indexSeries, toggleVibration),
-              IconButton(
-                  onPressed: () {
-                    exercise.days.add(DayExerciseModel(
-                        id: exercise.days.isEmpty
-                            ? 0
-                            : exercise.days.last!.id + 1,
-                        date: DateTime.now(),
-                        series: []));
-                    putDay(exercise);
-                    setState(() {});
-                  },
-                  icon: const Icon(Icons.add_circle_outline)),
-              if (exercise.days.isNotEmpty)
-                IconButton(
-                    onPressed: () async {
-                      final del = await deleteDay();
-                      if (del == true) {
-                        exercise.days.removeLast();
-                        removeDay(
-                            exercise.nameMuscle, exercise.id, exercise.days);
-                        setState(() {
-                          indexSeries = 0;
-                          indexRepps = 0;
-                        });
-                      }
-                    },
-                    icon: const Icon(Icons.delete)),
-            ],
-          ),
+        SizedBox(
+          width: double.infinity,
+          height: 40,
+          child: SuperListView.builder(
+              scrollDirection: Axis.horizontal,
+              controller: _scrollController,
+              listController: _listController,
+              itemCount: exercise.days.length + 1,
+              itemBuilder: (_, index) {
+                if (exercise.days.length - index - 1 < 0) {
+                  return IconButton(
+                      onPressed: () {
+                        exercise.days.add(DayExerciseModel(
+                            id: exercise.days.isEmpty
+                                ? 0
+                                : exercise.days.last!.id + 1,
+                            date: DateTime.now(),
+                            series: []));
+                        putDay(exercise);
+                        setState(() {});
+                      },
+                      icon: const Icon(Icons.add_circle_outline));
+                }
+
+                final ex = exercise.days[index];
+                return listDate(ex, indexSeries, toggleVibration);
+              }),
         ),
         const SizedBox(
           height: 20,
@@ -129,7 +135,7 @@ class _ContainerExpandState extends State<ContainerExpand> {
                     toggleVibration),
                 IconButton(
                     onPressed: () async {
-                      final repps = await widget.addserie(0);
+                      final repps = await addserie(0);
                       if (repps != null) {
                         exercise.days[indexSeries]!.series.add(SeriesModel(
                             series: exercise.days[indexSeries]!.series.isEmpty
@@ -147,8 +153,7 @@ class _ContainerExpandState extends State<ContainerExpand> {
                         final del = await deleteDay();
                         if (del == true) {
                           exercise.days[indexSeries]!.series.removeLast();
-                          removeDay(
-                              exercise.nameMuscle, exercise.id, exercise.days);
+                          removeDay(exercise);
                           setState(() {
                             indexSeries = 0;
                             indexRepps = 0;
@@ -183,5 +188,61 @@ class _ContainerExpandState extends State<ContainerExpand> {
         ],
       ],
     );
+  }
+
+  Future<int?> addserie(int repps) async {
+    return showDialog<int>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Total de repetições'),
+          content: TextFormField(
+            keyboardType: TextInputType.phone,
+            onChanged: (value) {
+              repps = int.parse(value);
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(repps);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteDialog(String id, String muscle, String nameExercise) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('delete $nameExercise'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  deleteExercise(id, muscle);
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Sim'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Não'),
+              )
+            ],
+          );
+        });
   }
 }

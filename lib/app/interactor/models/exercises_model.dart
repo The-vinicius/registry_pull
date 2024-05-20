@@ -1,17 +1,17 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:registry_pull/app/interactor/models/day_exercise_model.dart';
-
+import 'package:equatable/equatable.dart';
 part 'exercises_model.g.dart';
 
 @JsonSerializable()
-class ExercisesModel {
+class ExercisesModel extends Equatable {
   final String id;
   final String nameMuscle;
   final String nameExercise;
   final bool isExpanded;
   final List<DayExerciseModel?> days;
 
-  ExercisesModel({
+  const ExercisesModel({
     required this.id,
     required this.nameMuscle,
     required this.nameExercise,
@@ -39,4 +39,7 @@ class ExercisesModel {
       days: days ?? this.days,
     );
   }
+
+  @override
+  List<Object?> get props => [id, nameMuscle, nameExercise, isExpanded, days];
 }
