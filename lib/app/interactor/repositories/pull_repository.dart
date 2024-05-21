@@ -7,7 +7,9 @@ abstract class PullRepository {
   Future<void> insertDay(DayExerciseModel model, int id);
   Future<void> insertSerie(SeriesModel model, int id);
   Future<List<ExercisesModel>> getExercises(String muscle);
-  Future<void> deleteExercise(ExercisesModel model);
-  Future<void> deleteDay(DayExerciseModel model);
-  Future<void> deleteSerie(SeriesModel model);
+  Future<List<DayExerciseModel>> getDays(int id);
+  Future<List<SeriesModel>> getSeries(int id);
+  Future<void> deleteExercise(int id);
+  Future<void> deleteDay(int id);
+  Future<void> deleteSerie(int id);
 }

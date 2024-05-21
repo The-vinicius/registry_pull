@@ -20,6 +20,7 @@ class DB {
     return await openDatabase(
       'pull.db',
       onCreate: _onCreate,
+      version: 1,
     );
   }
 
@@ -33,7 +34,7 @@ class DB {
     CREATE TABLE exercicios (
       id INTEGER PRIMARY KEY AUTOINCREMENT, 
       nameMuscle TEXT,
-      nameExercise TEXT,
+      nameExercise TEXT
     );    
     ''';
 
@@ -42,7 +43,7 @@ class DB {
       id INTEGER PRIMARY KEY AUTOINCREMENT, 
       date TEXT,
       exercicio_id INTEGER,
-      FOREIGN KEY (exercicio_id) REFERENCES exercicios(id)
+      FOREIGN KEY (exercicio_id) REFERENCES exercicios(id) ON DELETE CASCADE
     );    
     ''';
 
@@ -52,7 +53,7 @@ class DB {
       series INT, 
       repetitions INT,
       day_id INTEGER,
-      FOREIGN KEY (day_id) REFERENCES days(id)
+      FOREIGN KEY (day_id) REFERENCES days(id) ON DELETE CASCADE 
     );    
     ''';
 }

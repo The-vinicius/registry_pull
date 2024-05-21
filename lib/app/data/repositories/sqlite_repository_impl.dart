@@ -4,25 +4,7 @@ import 'package:registry_pull/app/interactor/models/exercises_model.dart';
 import 'package:registry_pull/app/interactor/models/series_model.dart';
 import 'package:registry_pull/app/interactor/repositories/pull_repository.dart';
 
-class SqluteRepositoryImpl extends PullRepository {
-  @override
-  Future<void> deleteDay(DayExerciseModel model) {
-    // TODO: implement deleteDay
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> deleteExercise(ExercisesModel model) {
-    // TODO: implement deleteExercise
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> deleteSerie(SeriesModel model) {
-    // TODO: implement deleteSerie
-    throw UnimplementedError();
-  }
-
+class SqliteRepositoryImpl extends PullRepository {
   @override
   Future<List<ExercisesModel>> getExercises(String muscle) async {
     final db = await DB.instancia.database;
@@ -31,10 +13,28 @@ class SqluteRepositoryImpl extends PullRepository {
   }
 
   @override
+  Future<List<DayExerciseModel>> getDays(int id) async {
+    final db = await DB.instancia.database;
+    final items = await db.query('days', where: 'id = ?', whereArgs: [id]);
+    return items.map((e) => DayExerciseModel.fromJson(e)).toList();
+  }
+
+  @override
+  Future<List<SeriesModel>> getSeries(int id) async {
+    final db = await DB.instancia.database;
+    final items = await db.query('series', where: 'id = ?', whereArgs: [id]);
+    return items.map((e) => SeriesModel.fromJson(e)).toList();
+  }
+
+  @override
   Future<void> insertDay(DayExerciseModel model, int id) async {
     final db = await DB.instancia.database;
     final data = {'date': model.date.toIso8601String(), 'exercicio_id': id};
-    await db.insert('days', data);
+    if (model.id < 0) {
+      await db.insert('days', data);
+    } else if (model.id > 0) {
+      db.update('days', data, where: 'id = ?', whereArgs: [model.id]);
+    }
   }
 
   @override
@@ -44,7 +44,11 @@ class SqluteRepositoryImpl extends PullRepository {
       'nameMuscle': model.nameMuscle,
       'nameExercise': model.nameExercise
     };
-    await db.insert('exercicios', data);
+    if (model.id < 0) {
+      await db.insert('exercicios', data);
+    } else if (model.id > 0) {
+      db.update('exercicios', data, where: 'id = ?', whereArgs: [model.id]);
+    }
   }
 
   @override
@@ -55,7 +59,29 @@ class SqluteRepositoryImpl extends PullRepository {
       'repetitions': model.repetitions,
       'day_id': id
     };
-    await db.insert('series', data);
+    if (model.id < 0) {
+      await db.insert('series', data);
+    } else if (model.id > 0) {
+      db.update('series', data, where: 'id = ?', whereArgs: [model.id]);
+    }
+  }
+
+  @override
+  Future<void> deleteExercise(int id) async {
+    final db = await DB.instancia.database;
+    await db.delete('exercicios', where: 'id = ?', whereArgs: [id]);
+  }
+
+  @override
+  Future<void> deleteDay(int id) async {
+    final db = await DB.instancia.database;
+    await db.delete('days', where: 'id = ?', whereArgs: [id]);
+  }
+
+  @override
+  Future<void> deleteSerie(int id) async {
+    final db = await DB.instancia.database;
+    await db.delete('series', where: 'id = ?', whereArgs: [id]);
   }
 }
 

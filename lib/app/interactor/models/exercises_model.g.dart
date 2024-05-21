@@ -8,15 +8,9 @@ part of 'exercises_model.dart';
 
 ExercisesModel _$ExercisesModelFromJson(Map<String, dynamic> json) =>
     ExercisesModel(
-      id: json['id'] as String,
+      id: json['id'] as int,
       nameMuscle: json['nameMuscle'] as String,
       nameExercise: json['nameExercise'] as String,
-      isExpanded: json['isExpanded'] as bool,
-      days: (json['days'] as List<dynamic>)
-          .map((e) => e == null
-              ? null
-              : DayExerciseModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
     );
 
 Map<String, dynamic> _$ExercisesModelToJson(ExercisesModel instance) =>
@@ -24,6 +18,4 @@ Map<String, dynamic> _$ExercisesModelToJson(ExercisesModel instance) =>
       'id': instance.id,
       'nameMuscle': instance.nameMuscle,
       'nameExercise': instance.nameExercise,
-      'isExpanded': instance.isExpanded,
-      'days': instance.days,
     };

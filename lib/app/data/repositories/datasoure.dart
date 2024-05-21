@@ -5,13 +5,13 @@ class Datasouce {
   final _db = Localstore.instance;
 
   Future<void> insertExercise(ExercisesModel model) async {
-    model = model.copyWith(id: '');
+    model = model.copyWith(id: 1);
 
     await _db.collection(model.nameMuscle).doc().set(model.toJson());
   }
 
   Future<void> update(ExercisesModel model) async {
-    await _db.collection(model.nameMuscle).doc(model.id).set(model.toJson());
+    await _db.collection(model.nameMuscle).doc().set(model.toJson());
   }
 
   Future<List<ExercisesModel>> getExercises(String muscle) async {

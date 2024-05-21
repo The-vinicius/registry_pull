@@ -5,18 +5,14 @@ part 'exercises_model.g.dart';
 
 @JsonSerializable()
 class ExercisesModel extends Equatable {
-  final String id;
+  final int id;
   final String nameMuscle;
   final String nameExercise;
-  final bool isExpanded;
-  final List<DayExerciseModel?> days;
 
   const ExercisesModel({
     required this.id,
     required this.nameMuscle,
     required this.nameExercise,
-    this.isExpanded = false,
-    required this.days,
   });
 
   factory ExercisesModel.fromJson(Map<String, dynamic> json) =>
@@ -25,7 +21,7 @@ class ExercisesModel extends Equatable {
   Map<String, dynamic> toJson() => _$ExercisesModelToJson(this);
 
   ExercisesModel copyWith({
-    String? id,
+    int? id,
     String? nameMuscle,
     String? nameExercise,
     bool? isExpanded,
@@ -35,11 +31,9 @@ class ExercisesModel extends Equatable {
       id: id ?? this.id,
       nameMuscle: nameMuscle ?? this.nameMuscle,
       nameExercise: nameExercise ?? this.nameExercise,
-      isExpanded: isExpanded ?? this.isExpanded,
-      days: days ?? this.days,
     );
   }
 
   @override
-  List<Object?> get props => [id, nameMuscle, nameExercise, isExpanded, days];
+  List<Object?> get props => [id, nameMuscle, nameExercise];
 }

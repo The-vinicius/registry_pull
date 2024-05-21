@@ -1,7 +1,7 @@
 import 'package:asp/asp.dart';
 import 'package:flutter/material.dart';
 import 'package:registry_pull/app/core/widgets/container_expand.dart';
-import 'package:registry_pull/app/interactor/actions/exercises_action.dart';
+import 'package:registry_pull/app/interactor/actions/pull_action.dart';
 import 'package:registry_pull/app/interactor/atoms/exercise_atom.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
 import 'package:routefly/routefly.dart';
@@ -24,10 +24,9 @@ class _ExercisesPageState extends State<ExercisesPage> {
 
   void addDialog([ExercisesModel? model]) {
     model ??= ExercisesModel(
-      id: 'stya',
+      id: -1,
       nameMuscle: muscle,
       nameExercise: '',
-      days: const [],
     );
     showDialog(
       context: context,
@@ -100,7 +99,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
                 ),
               )
             : SingleChildScrollView(
-              key: const Key('certo'),
+                key: const Key('certo'),
                 child: loading.value
                     ? const Center(
                         child: CircularProgressIndicator(),
