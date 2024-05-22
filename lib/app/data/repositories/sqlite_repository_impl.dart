@@ -15,14 +15,16 @@ class SqliteRepositoryImpl extends PullRepository {
   @override
   Future<List<DayExerciseModel>> getDays(int id) async {
     final db = await DB.instancia.database;
-    final items = await db.query('days', where: 'id = ?', whereArgs: [id]);
+    final items =
+        await db.query('days', where: 'exercicio_id = ?', whereArgs: [id]);
     return items.map((e) => DayExerciseModel.fromJson(e)).toList();
   }
 
   @override
   Future<List<SeriesModel>> getSeries(int id) async {
     final db = await DB.instancia.database;
-    final items = await db.query('series', where: 'id = ?', whereArgs: [id]);
+    final items =
+        await db.query('series', where: 'day_id = ?', whereArgs: [id]);
     return items.map((e) => SeriesModel.fromJson(e)).toList();
   }
 
