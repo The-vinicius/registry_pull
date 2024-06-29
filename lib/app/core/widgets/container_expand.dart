@@ -18,8 +18,6 @@ class ContainerExpand extends StatefulWidget {
 }
 
 class _ContainerExpandState extends State<ContainerExpand> {
-  var indexSeries = 0;
-  var indexRepps = 0;
   final controller = ControllerPull();
 
   final _listController = ListController();
@@ -53,10 +51,10 @@ class _ContainerExpandState extends State<ContainerExpand> {
   void toggleVibration(int index, bool serie) {
     setState(() {
       if (serie) {
-        indexSeries = index;
-        indexRepps = 0;
+        controller.indexSeries = index;
+        controller.indexRepps = 0;
       } else {
-        indexRepps = index;
+        controller.indexRepps = index;
       }
     });
   }
@@ -81,58 +79,107 @@ class _ContainerExpandState extends State<ContainerExpand> {
   @override
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
-    final indexSeries = controller.days.last.id;
 
     return ExpansionTile(
-        key: const Key('expansion'),
-        childrenPadding: const EdgeInsets.all(10),
-        title: GestureDetector(
-          onLongPress: () => deleteDialog(
-              exercise.id, exercise.nameMuscle, exercise.nameExercise),
-          child: Text(exercise.nameExercise),
-        ),
-        expandedCrossAxisAlignment: CrossAxisAlignment.start,
-        expandedAlignment: Alignment.centerLeft,
-        children: [
-          if (!controller.loading)
-            SizedBox(
-              height: 70,
-              child: SuperListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: controller.days.length,
-                  itemBuilder: (cxt, index) {
-                    return listDate(
-                        controller.days[index], indexSeries, toggleVibration);
-                  }),
-            ),
-          Row(
-            children: [
+      key: const Key('expansion'),
+      childrenPadding: const EdgeInsets.all(10),
+      title: GestureDetector(
+        onLongPress: () => deleteDialog(
+            exercise.id, exercise.nameMuscle, exercise.nameExercise),
+        child: Text(exercise.nameExercise),
+      ),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      expandedAlignment: Alignment.centerLeft,
+      children: [
+        if (!controller.loading)
+          SizedBox(
+            height: 70,
+            child: SuperListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: controller.days.length,
+                itemBuilder: (cxt, index) {
+                  return listDate(controller.days[index],
+                      controller.indexSeries, toggleVibration);
+                }),
+          ),
+        Row(
+          children: [
+            IconButton(
+                onPressed: () {
+                  controller.putDay(exercise.id);
+                },
+                icon: const Icon(Icons.add)),
+            if (controller.days.isNotEmpty)
               IconButton(
                   onPressed: () {
-                    controller.putDay(exercise.id);
+                    controller.deleteDay(controller.days.last.id);
                   },
-                  icon: const Icon(Icons.add)),
-              if (controller.days.isNotEmpty)
-                IconButton(
-                    onPressed: () {
-                      controller.deleteDay(controller.days.last.id);
-                    },
-                    icon: const Icon(Icons.delete))
-            ],
-          ),
-          if (controller.days.isNotEmpty)
-            Row(
-              children: [
-                ...listSeries(controller.series, indexRepps, toggleVibration),
-              ],
-            )
-        ]);
+                  icon: const Icon(Icons.delete))
+          ],
+        ),
+        if (controller.days.isNotEmpty)
+          FutureBuilder(
+              future: controller.getSeries(controller.indexSeries),
+              builder: (cxt, snapshot) {
+                if (!snapshot.hasData) {
+                  return IconButton(
+                      onPressed: () async {
+                        final repps = await addserie();
+                        if (repps != null) {
+                          controller.putSerie(
+                              controller.series.length + 1,
+                              repps,
+                              controller.days[controller.indexSeries].id);
+                        }
+                      },
+                      icon: const Icon(Icons.add));
+                } else {
+                  return Row(
+                    children: [
+                      ...listSeries(controller.series, controller.indexRepps,
+                          toggleVibration),
+                      IconButton(
+                          onPressed: () async {
+                            final repps = await addserie();
+                            if (repps != null) {
+                              controller.putSerie(
+                                  controller.series.length + 1,
+                                  repps,
+                                  controller.days[controller.indexSeries].id);
+                            }
+                          },
+                          icon: const Icon(Icons.add)),
+                      if (controller.days.isNotEmpty)
+                        IconButton(
+                            onPressed: () {
+                              controller.deleteSerie(controller.days.last.id);
+                            },
+                            icon: const Icon(Icons.delete))
+                    ],
+                  );
+                }
+              }),
+        if (controller.series.isNotEmpty)
+          Row(
+            children: List.generate(
+              controller.series[controller.indexRepps].repetitions,
+              (index) => Container(
+                margin: const EdgeInsets.only(right: 5),
+                height: 50,
+                width: 10,
+                color: Colors.red,
+              ),
+            ),
+          )
+      ],
+    );
   }
 
-  Future<int?> addserie(int repps) async {
+  Future<int?> addserie() async {
     return showDialog<int>(
       context: context,
       builder: (context) {
+        int repps = 0;
         return AlertDialog(
           title: const Text('Total de repetições'),
           content: TextFormField(
