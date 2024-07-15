@@ -3,7 +3,7 @@ import 'package:registry_pull/routes.dart';
 import 'package:routefly/routefly.dart';
 
 class MuscleTitle extends StatelessWidget {
-  const MuscleTitle({super.key, required this.title});
+  const MuscleTitle({required super.key, required this.title});
   final String title;
 
   @override
