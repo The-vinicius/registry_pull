@@ -4,7 +4,6 @@ import 'package:registry_pull/app/core/widgets/list_series.dart';
 import 'package:registry_pull/app/interactor/actions/pull_action.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
 import 'package:registry_pull/app/states/controller_pull.dart';
-import 'package:super_sliver_list/super_sliver_list.dart';
 
 class ShowPulls extends StatefulWidget {
   const ShowPulls({super.key, required this.exercise});
@@ -28,7 +27,7 @@ class _ShowPullsState extends State<ShowPulls> {
 
   @override
   void dispose() {
-    // controllerPull.dispose();
+    controllerPull.dispose();
     super.dispose();
   }
 
@@ -65,16 +64,16 @@ class _ShowPullsState extends State<ShowPulls> {
               ],
             ),
           ),
-          SizedBox(
-              height: 70,
-              child: SuperListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: controllerPull.days.length,
-                  itemBuilder: (ctx, index) {
-                    final day = controllerPull.days[index];
-                    return listDate(day, controllerPull.indexSeries,
-                        controllerPull.toggleVibration, index);
-                  })),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            reverse: true,
+            child: Row(
+                children: controllerPull.days.asMap().entries.map((entry) {
+              int indexId = entry.key;
+              return listDate(entry.value, controllerPull.indexSeries,
+                  controllerPull.toggleVibration, indexId);
+            }).toList()),
+          ),
           if (controllerPull.days.isNotEmpty) ...[
             const Padding(
               padding: EdgeInsets.all(10),
