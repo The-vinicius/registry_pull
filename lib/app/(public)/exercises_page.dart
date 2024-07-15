@@ -1,6 +1,6 @@
 import 'package:asp/asp.dart';
 import 'package:flutter/material.dart';
-import 'package:registry_pull/app/core/widgets/container_expand.dart';
+import 'package:registry_pull/app/core/widgets/show_pulls.dart';
 import 'package:registry_pull/app/interactor/actions/pull_action.dart';
 import 'package:registry_pull/app/interactor/atoms/exercise_atom.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
@@ -106,7 +106,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
                       )
                     : Column(
                         children: exercises
-                            .map((exercise) => ContainerExpand(
+                            .map((exercise) => ShowPulls(
                                   exercise: exercise,
                                 ))
                             .toList(),
