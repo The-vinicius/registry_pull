@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:registry_pull/app/injector.dart';
 import 'package:registry_pull/app/interactor/models/day_exercise_model.dart';
-import 'package:registry_pull/app/interactor/models/exercises_model.dart';
 import 'package:registry_pull/app/interactor/models/series_model.dart';
 import 'package:registry_pull/app/interactor/repositories/pull_repository.dart';
 
@@ -11,6 +10,7 @@ class ControllerPull extends ChangeNotifier {
   List<SeriesModel> series = [];
   int indexSeries = 0;
   int indexRepps = 0;
+  int repps = 0;
 
   Future<void> getDays(id) async {
     loading = true;
@@ -18,6 +18,10 @@ class ControllerPull extends ChangeNotifier {
 
     final repository = injector.get<PullRepository>();
     days = await repository.getDays(id);
+    indexSeries = days.length - 1;
+    if (days.isNotEmpty) {
+      await getSeries(days.last.id);
+    }
 
     loading = false;
     notifyListeners();
@@ -31,22 +35,28 @@ class ControllerPull extends ChangeNotifier {
     final repository = injector.get<PullRepository>();
     await repository.insertDay(model, id);
     days.add(model);
+    await getDays(id);
     loading = false;
     notifyListeners();
   }
 
-  Future<void> deleteDay(int id) async {
+  Future<void> deleteDay() async {
+    final id = days.last.id;
     loading = true;
 
     notifyListeners();
     final repository = injector.get<PullRepository>();
     await repository.deleteDay(id);
-    days.removeWhere((element) => element.id == id);
+    days.removeLast();
+    series.clear();
+    indexSeries = days.length - 1;
     loading = false;
     notifyListeners();
   }
 
-  Future<void> putSerie(int serie, int repps, int id) async {
+  Future<void> putSerie(int repps) async {
+    final id = days[indexSeries].id;
+    final serie = series.length;
     final model = SeriesModel(id: -1, series: serie, repetitions: repps);
     loading = true;
 
@@ -63,26 +73,39 @@ class ControllerPull extends ChangeNotifier {
 
     notifyListeners();
     final repository = injector.get<PullRepository>();
+    series.clear();
     series = await repository.getSeries(id);
+    if (series.isNotEmpty) {
+      repps = series.first.repetitions;
+    }
     loading = false;
     notifyListeners();
   }
 
-  Future<void> deleteSerie(int id) async {
+  Future<void> deleteSerie() async {
     loading = true;
+    final id = series.last.id;
 
     notifyListeners();
     final repository = injector.get<PullRepository>();
     await repository.deleteSerie(id);
-    series.removeWhere((element) => element.id == id);
+    series.removeLast();
     loading = false;
     notifyListeners();
   }
 
-  Future<void> putExercise(ExercisesModel model) async {
+  void toggleVibration(int index, bool serie) async {
     loading = true;
     notifyListeners();
-    final repository = injector.get<PullRepository>();
-    await repository.insertExercise(model);
+    if (serie) {
+      indexSeries = index;
+      indexRepps = 0;
+      await getSeries(days[indexSeries].id);
+    } else {
+      indexRepps = index;
+      repps = series[indexRepps].repetitions;
+    }
+    loading = false;
+    notifyListeners();
   }
 }
