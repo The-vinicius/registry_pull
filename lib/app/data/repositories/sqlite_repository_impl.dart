@@ -8,7 +8,8 @@ class SqliteRepositoryImpl extends PullRepository {
   @override
   Future<List<ExercisesModel>> getExercises(String muscle) async {
     final db = await DB.instancia.database;
-    final items = await db.query('exercicios');
+    final items = await db.rawQuery(
+        "SELECT * FROM exercicios WHERE exercicios.nameMuscle = \"$muscle\";");
     return items.map((e) => ExercisesModel.fromJson(e)).toList();
   }
 
@@ -86,21 +87,3 @@ class SqliteRepositoryImpl extends PullRepository {
     await db.delete('series', where: 'id = ?', whereArgs: [id]);
   }
 }
-
-String query = '''
-SELECT 
-    exercicios.id AS exercicio_id, 
-    exercicios.nameMuscle, 
-    exercicios.nameExercise, 
-    days.id AS day_id, 
-    days.date, 
-    series.id AS series_id, 
-    series.series,
-	  series.repetitions
-FROM 
-    exercicios
-LEFT JOIN 
-    days ON exercicios.id = days.exercicio_id
-LEFT JOIN 
-    series ON days.id = series.day_id;
-''';
