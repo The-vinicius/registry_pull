@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:registry_pull/app/core/widgets/muscle_title.dart';
+import 'package:registry_pull/app/core/constants/muscles.dart';
+import 'package:registry_pull/app/core/widgets/muscle_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -14,50 +15,40 @@ class HomePage extends StatelessWidget {
             image: DecorationImage(
                 image: AssetImage('assets/images/gym4.png'), fit: BoxFit.cover),
           ),
-          child: const Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 'TREINOS',
                 style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 40,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 48,
+                  fontFamily: 'Roboto',
                   color: Colors.white,
                   shadows: [
                     Shadow(
                         color: Colors.black87,
                         offset: Offset(0, 2),
-                        blurRadius: 10),
+                        blurRadius: 15),
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 40,
               ),
-              MuscleTitle(
-                title: 'Braços',
-                key: Key('braços'),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              MuscleTitle(
-                title: 'Peito',
-                key: Key('peito'),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              MuscleTitle(
-                title: 'Pernas',
-                key: Key('pernas'),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              MuscleTitle(
-                title: 'Costas',
-                key: Key('costas'),
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(30),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                  ),
+                  itemCount: muscles.length,
+                  itemBuilder: (context, index) {
+                    return MuscleWidget(muscle: muscles[index]);
+                  },
+                ),
               ),
             ],
           ),
