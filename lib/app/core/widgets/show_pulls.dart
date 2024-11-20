@@ -67,12 +67,15 @@ class _ShowPullsState extends State<ShowPulls> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             reverse: true,
-            child: Row(
-                children: controllerPull.days.asMap().entries.map((entry) {
-              int indexId = entry.key;
-              return listDate(entry.value, controllerPull.indexSeries,
-                  controllerPull.toggleVibration, indexId);
-            }).toList()),
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                  children: controllerPull.days.asMap().entries.map((entry) {
+                int indexId = entry.key;
+                return listDate(entry.value, controllerPull.indexSeries,
+                    controllerPull.toggleVibration, indexId);
+              }).toList()),
+            ),
           ),
           if (controllerPull.days.isNotEmpty) ...[
             const Padding(
@@ -82,49 +85,53 @@ class _ShowPullsState extends State<ShowPulls> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
             ),
-            Row(children: [
-              ...listSeries(controllerPull.series, controllerPull.indexRepps,
-                  controllerPull.toggleVibration),
-              IconButton(
-                  onPressed: () async {
-                    final repps = await addserie();
-                    if (repps != null) {
-                      await controllerPull.putSerie(
-                        repps,
-                      );
-                    }
-                  },
-                  icon: const Icon(Icons.add)),
-              if (controllerPull.series.isNotEmpty)
-                IconButton(
-                    onPressed: () async {
-                      await controllerPull.deleteSerie();
-                    },
-                    icon: const Icon(Icons.delete)),
-            ])
-          ],
-          if (controllerPull.series.isNotEmpty) ...[
-            const Padding(
-              padding: EdgeInsets.all(10),
-              child: Text(
-                'Repetições: ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.all(10),
-              child: Row(
-                children: List.generate(
-                  controllerPull.repps,
-                  (index) => Container(
-                    margin: const EdgeInsets.only(right: 5),
-                    height: 50,
-                    width: 10,
-                    color: Colors.red,
-                  ),
-                ),
-              ),
+              child: Row(children: [
+                ...listSeries(controllerPull.series, controllerPull.indexRepps,
+                    controllerPull.toggleVibration),
+                IconButton(
+                    onPressed: () async {
+                      final repps = await addserie();
+                      if (repps != null) {
+                        await controllerPull.putSerie(
+                          repps,
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.add)),
+                if (controllerPull.series.isNotEmpty)
+                  IconButton(
+                      onPressed: () async {
+                        await controllerPull.deleteSerie();
+                      },
+                      icon: const Icon(Icons.delete)),
+              ]),
             )
+          ],
+          if (controllerPull.series.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Text(
+                'Repetições: ${controllerPull.repps} ',
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              ),
+            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(10),
+            //   child: Row(
+            //     children: List.generate(
+            //       controllerPull.repps,
+            //       (index) => Container(
+            //         margin: const EdgeInsets.only(right: 5),
+            //         height: 50,
+            //         width: 10,
+            //         color: Colors.red,
+            //       ),
+            //     ),
+            //   ),
+            // )
           ]
         ] else if (controllerPull.loading)
           const CircularProgressIndicator()
