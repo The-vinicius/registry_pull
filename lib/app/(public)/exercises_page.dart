@@ -88,8 +88,8 @@ class _ExercisesPageState extends State<ExercisesPage> {
               icon: const Icon(Icons.add))
         ],
       ),
-      body: RxBuilder(builder: (context) {
-        final exercises = exerciseState.value;
+      body: AtomBuilder(builder: (context, get) {
+        final exercises = get(exerciseState);
         return exercises.isEmpty
             ? const Center(
                 child: Text(
@@ -100,7 +100,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
               )
             : SingleChildScrollView(
                 key: const Key('certo'),
-                child: loading.value
+                child: loading.state
                     ? const Center(
                         child: CircularProgressIndicator(),
                       )
