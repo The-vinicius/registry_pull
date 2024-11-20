@@ -1,5 +1,5 @@
 import 'package:registry_pull/app/injector.dart';
-import 'package:registry_pull/app/interactor/atoms/exercise_atom.dart';
+import 'package:registry_pull/app/interactor/atoms/actions.dart';
 import 'package:registry_pull/app/interactor/models/day_exercise_model.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
 import 'package:registry_pull/app/interactor/models/series_model.dart';
@@ -22,10 +22,12 @@ void putSerie(SeriesModel model, int id) async {
 }
 
 Future<void> getExercises(String muscle) async {
-  loading.value = true;
+  changeLoading(true);
   final repository = injector.get<PullRepository>();
-  exerciseState.value = await repository.getExercises(muscle);
-  loading.value = false;
+  final exercise = await repository.getExercises(muscle);
+
+  changeExerciseState(exercise);
+  changeLoading(false);
 }
 
 Future<List<DayExerciseModel>> getDays(int id) async {

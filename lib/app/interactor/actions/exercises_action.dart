@@ -1,5 +1,5 @@
 import 'package:registry_pull/app/injector.dart';
-import 'package:registry_pull/app/interactor/atoms/exercise_atom.dart';
+import 'package:registry_pull/app/interactor/atoms/actions.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
 import 'package:registry_pull/app/interactor/repositories/exercises_repository.dart';
 
@@ -10,10 +10,11 @@ Future<void> putExercises(ExercisesModel model) async {
 }
 
 Future<void> getExercises(String muscle) async {
-  loading.value = true;
+  changeLoading(true);
   final repository = injector.get<ExercisesRepository>();
-  exerciseState.value = await repository.getExercises(muscle);
-  loading.value = false;
+  final exercise = await repository.getExercises(muscle);
+  changeExerciseState(exercise);
+  changeLoading(false);
 }
 
 deleteExercise(String id, String muscle) async {
