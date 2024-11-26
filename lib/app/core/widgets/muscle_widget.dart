@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:registry_pull/app/core/constants/muscles.dart';
 import 'package:registry_pull/routes.dart';
 import 'package:routefly/routefly.dart';
 
@@ -8,18 +9,15 @@ class MuscleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final path = iconM[muscle];
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.transparent, Color.fromARGB(255, 0, 0, 0) ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.lightBlueAccent,
+        borderRadius: BorderRadius.circular(4),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
-            blurRadius: 10,
+            blurRadius: 5,
             offset: const Offset(0, 5),
           ),
         ],
@@ -35,20 +33,22 @@ class MuscleWidget extends StatelessWidget {
         onPressed: () {
           Routefly.pushNavigate(routePaths.exercises, arguments: muscle);
         },
-        child: Text(
-          muscle.toUpperCase(),
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            shadows: [
-              Shadow(
-                color: Colors.black,
-                offset: Offset(0, 2),
-                blurRadius: 5,
+        child: Column(
+          children: [
+            SizedBox(
+                width: 50,
+                height: 70,
+                child: Image.asset('assets/muscle/$path.png')),
+            const Spacer(),
+            Text(
+              muscle.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
