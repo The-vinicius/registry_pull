@@ -11,34 +11,47 @@ class HomePage extends StatelessWidget {
       body: SafeArea(
         child: Container(
           width: MediaQuery.of(context).size.width,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/images/gym4.png'), fit: BoxFit.cover),
-          ),
+          decoration:
+              const BoxDecoration(color: Color.fromRGBO(255, 255, 255, 1)),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'TREINOS',
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 48,
-                  fontFamily: 'Roboto',
-                  color: Colors.white,
-                  shadows: [
-                    Shadow(
-                        color: Colors.black87,
-                        offset: Offset(0, 2),
-                        blurRadius: 15),
-                  ],
+              Container(
+                margin: const EdgeInsets.only(left: 20, top: 50),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    tileMode: TileMode.mirror,
+                    colors: [Colors.orangeAccent, Colors.lightBlueAccent],
+                    begin: Alignment.centerLeft,
+                  ),
+                  color: Colors.blueAccent, // Cor de fundo
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'TREINOS',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 20,
+                    fontFamily: 'Roboto',
+                    color: Colors.white,
+                  ),
                 ),
               ),
               const SizedBox(
-                height: 40,
+                height: 50,
+              ),
+              const Padding(
+                padding: EdgeInsets.only(left: 20, top: 20),
+                child: Text(
+                  'A jornada começa aqui.',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               Expanded(
                 child: GridView.builder(
-                  padding: const EdgeInsets.all(30),
+                  padding: const EdgeInsets.all(20),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 16,
