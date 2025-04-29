@@ -135,9 +135,6 @@ class _ExercisesPageState extends State<ExercisesPage> {
             color: Colors.black,
           ),
         ),
-        actions: [
-          IconButton(onPressed: addDialog, icon: const Icon(Icons.add))
-        ],
       ),
       body: RxBuilder(builder: (context) {
         final exercises = exerciseState.value;
@@ -165,6 +162,12 @@ class _ExercisesPageState extends State<ExercisesPage> {
                       ),
               );
       }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          addDialog();
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

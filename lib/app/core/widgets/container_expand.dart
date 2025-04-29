@@ -13,6 +13,7 @@ class ContainerExpand extends StatefulWidget {
     required this.addserie,
     required this.deleteDialog,
   });
+
   final ExercisesModel exercise;
   final Function(int) addserie;
   final Function(String, String, String) deleteDialog;
@@ -22,165 +23,231 @@ class ContainerExpand extends StatefulWidget {
 }
 
 class _ContainerExpandState extends State<ContainerExpand> {
-  var indexSeries = 0;
-  var indexRepps = 0;
+  late int _selectedDayIndex;
+  late int _selectedSeriesIndex;
 
-  Future<bool?> deleteDay() async {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Remover?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, false);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: const Text('Deleta'),
-            ),
-          ],
-        );
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    if (widget.exercise.days.isNotEmpty) {
+      // TODO: Verificar se o dia selecionado é o último
+      _selectedDayIndex = widget.exercise.days.length - 1;
+      _selectedSeriesIndex = 0;
+    } else {
+      _selectedDayIndex = 0;
+      _selectedSeriesIndex = 0;
+    }
   }
 
-  void toggleVibration(int index, bool serie) {
+  Future<bool?> _showDeleteConfirmationDialog() async {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remover?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Deleta'),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  void _handleDaySelection(int index, bool isDay) {
     setState(() {
-      if (serie) {
-        indexSeries = index;
-        indexRepps = 0;
+      if (isDay) {
+        _selectedDayIndex = index;
+        _selectedSeriesIndex = 0;
       } else {
-        indexRepps = index;
+        _selectedSeriesIndex = index;
       }
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final exercise = widget.exercise;
+  Future<void> _addNewDay() async {
+    final newDay = DayExerciseModel(
+      id: widget.exercise.days.isEmpty ? 0 : widget.exercise.days.last!.id + 1,
+      date: DateTime.now(),
+      series: [],
+    );
 
-    return ExpansionTile(
-      childrenPadding: const EdgeInsets.all(10),
-      title: GestureDetector(
-        onLongPress: () => widget.deleteDialog(
-            exercise.id, exercise.nameMuscle, exercise.nameExercise),
-        child: Text(exercise.nameExercise),
-      ),
-      expandedCrossAxisAlignment: CrossAxisAlignment.start,
-      expandedAlignment: Alignment.centerLeft,
+    widget.exercise.days.add(newDay);
+    await putDay(widget.exercise);
+    setState(() {
+      _selectedDayIndex = widget.exercise.days.length - 1;
+      _selectedSeriesIndex = 0;
+    });
+  }
+
+  Future<void> _removeLastDay() async {
+    final shouldDelete = await _showDeleteConfirmationDialog();
+    if (shouldDelete == true) {
+      widget.exercise.days.removeLast();
+      removeDay(
+        widget.exercise.nameMuscle,
+        widget.exercise.id,
+        widget.exercise.days,
+      );
+      setState(() {
+        _selectedDayIndex = widget.exercise.days.length - 1;
+        _selectedSeriesIndex = 0;
+      });
+    }
+  }
+
+  Future<void> _addNewSeries() async {
+    final repps = await widget.addserie(0);
+    if (repps != null) {
+      final newSeries = SeriesModel(
+        series: widget.exercise.days[_selectedDayIndex]!.series.isEmpty
+            ? 0
+            : widget.exercise.days[_selectedDayIndex]!.series.length,
+        repetitions: repps,
+      );
+
+      widget.exercise.days[_selectedDayIndex]!.series.add(newSeries);
+      await putDay(widget.exercise);
+      setState(() {
+        _selectedSeriesIndex =
+            widget.exercise.days[_selectedDayIndex]!.series.length - 1;
+      });
+    }
+  }
+
+  Future<void> _removeLastSeries() async {
+    final shouldDelete = await _showDeleteConfirmationDialog();
+    if (shouldDelete == true) {
+      widget.exercise.days[_selectedDayIndex]!.series.removeLast();
+      await removeDay(
+        widget.exercise.nameMuscle,
+        widget.exercise.id,
+        widget.exercise.days,
+      );
+      setState(() {
+        _selectedSeriesIndex =
+            widget.exercise.days[_selectedDayIndex]!.series.length - 1;
+      });
+    }
+  }
+
+  Widget _buildDateSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(
-          height: 20,
-        ),
         const Text('Data'),
         SingleChildScrollView(
           reverse: true,
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              ...listDate(exercise.days, indexSeries, toggleVibration),
+              ...listDate(
+                  widget.exercise.days, _selectedDayIndex, _handleDaySelection),
               IconButton(
-                  onPressed: () {
-                    exercise.days.add(DayExerciseModel(
-                        id: exercise.days.isEmpty
-                            ? 0
-                            : exercise.days.last!.id + 1,
-                        date: DateTime.now(),
-                        series: []));
-                    putDay(exercise);
-                    setState(() {});
-                  },
-                  icon: const Icon(Icons.add_circle_outline)),
-              if (exercise.days.isNotEmpty)
+                onPressed: _addNewDay,
+                icon: const Icon(Icons.add_circle_outline),
+              ),
+              if (widget.exercise.days.isNotEmpty)
                 IconButton(
-                    onPressed: () async {
-                      final del = await deleteDay();
-                      if (del == true) {
-                        exercise.days.removeLast();
-                        removeDay(
-                            exercise.nameMuscle, exercise.id, exercise.days);
-                        setState(() {
-                          indexSeries = 0;
-                          indexRepps = 0;
-                        });
-                      }
-                    },
-                    icon: const Icon(Icons.delete)),
+                  onPressed: _removeLastDay,
+                  icon: const Icon(Icons.delete),
+                ),
             ],
           ),
         ),
-        const SizedBox(
-          height: 20,
-        ),
-        if (exercise.days.isNotEmpty) ...[
-          const Text('Series'),
-          SingleChildScrollView(
-            reverse: true,
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                ...listSeries(exercise.days[indexSeries]!.series, indexRepps,
-                    toggleVibration),
+      ],
+    );
+  }
+
+  Widget _buildSeriesSection() {
+    if (widget.exercise.days.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Series'),
+        SingleChildScrollView(
+          reverse: true,
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              ...listSeries(
+                widget.exercise.days[_selectedDayIndex]!.series,
+                _selectedSeriesIndex,
+                _handleDaySelection,
+              ),
+              IconButton(
+                onPressed: _addNewSeries,
+                icon: const Icon(Icons.add_circle_outlined),
+              ),
+              if (widget.exercise.days[_selectedDayIndex]!.series.isNotEmpty)
                 IconButton(
-                    onPressed: () async {
-                      final repps = await widget.addserie(0);
-                      if (repps != null) {
-                        exercise.days[indexSeries]!.series.add(SeriesModel(
-                            series: exercise.days[indexSeries]!.series.isEmpty
-                                ? 0
-                                : exercise.days[indexSeries]!.series.length,
-                            repetitions: repps));
-                        putDay(exercise);
-                      }
-                      setState(() {});
-                    },
-                    icon: const Icon(Icons.add_circle_outlined)),
-                if (exercise.days[indexSeries]!.series.isNotEmpty)
-                  IconButton(
-                      onPressed: () async {
-                        final del = await deleteDay();
-                        if (del == true) {
-                          exercise.days[indexSeries]!.series.removeLast();
-                          removeDay(
-                              exercise.nameMuscle, exercise.id, exercise.days);
-                          setState(() {
-                            indexSeries = 0;
-                            indexRepps = 0;
-                          });
-                        }
-                      },
-                      icon: const Icon(Icons.delete)),
-              ],
+                  onPressed: _removeLastSeries,
+                  icon: const Icon(Icons.delete),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRepetitionsSection() {
+    if (widget.exercise.days.isEmpty ||
+        widget.exercise.days[_selectedDayIndex]!.series.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final repetitions = widget.exercise.days[_selectedDayIndex]!
+        .series[_selectedSeriesIndex].repetitions;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Repetições: $repetitions'),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: List.generate(
+              repetitions,
+              (index) => Container(
+                margin: const EdgeInsets.only(right: 5),
+                height: 50,
+                width: 10,
+                color: Colors.red,
+              ),
             ),
           ),
-          const SizedBox(
-            height: 20,
-          ),
-          if (exercise.days[indexSeries]!.series.isNotEmpty) ...[
-            Text(
-                'Repetições: ${exercise.days[indexSeries]!.series[indexRepps].repetitions}'),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(
-                  exercise.days[indexSeries]!.series[indexRepps].repetitions,
-                  (index) => Container(
-                    margin: const EdgeInsets.only(right: 5),
-                    height: 50,
-                    width: 10,
-                    color: Colors.red,
-                  ),
-                ),
-              ),
-            )
-          ]
-        ],
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ExpansionTile(
+      childrenPadding: const EdgeInsets.all(10),
+      title: GestureDetector(
+        onLongPress: () => widget.deleteDialog(
+          widget.exercise.id,
+          widget.exercise.nameMuscle,
+          widget.exercise.nameExercise,
+        ),
+        child: Text(widget.exercise.nameExercise),
+      ),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      expandedAlignment: Alignment.centerLeft,
+      children: [
+        const SizedBox(height: 20),
+        _buildDateSection(),
+        const SizedBox(height: 20),
+        _buildSeriesSection(),
+        const SizedBox(height: 20),
+        _buildRepetitionsSection(),
       ],
     );
   }

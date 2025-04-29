@@ -17,18 +17,19 @@ Future<void> getExercises(String muscle) async {
   loading.value = false;
 }
 
-deleteExercise(String id, String muscle) async {
+Future<void> deleteExercise(String id, String muscle) async {
   final repository = injector.get<ExercisesRepository>();
   await repository.deleteExercise(id, muscle);
   await getExercises(muscle);
 }
 
-void putDay(ExercisesModel model) async {
+Future<void> putDay(ExercisesModel model) async {
   final repository = injector.get<ExercisesRepository>();
   await repository.insertDayExercise(model);
 }
 
-void removeDay(String muscle, String id, List<DayExerciseModel?> days) async {
+Future<void> removeDay(
+    String muscle, String id, List<DayExerciseModel?> days) async {
   final repository = injector.get<ExercisesRepository>();
   await repository.deleteDayExercise(muscle, id, days);
 }
