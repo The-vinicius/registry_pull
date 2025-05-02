@@ -22,37 +22,52 @@ class _ExercisesPageState extends State<ExercisesPage> {
     super.initState();
   }
 
-  void addDialog([ExercisesModel? model]) {
+  void addExercise([ExercisesModel? model]) {
+    final formKey = GlobalKey<FormState>();
+    final nameController = TextEditingController();
+
     model ??= ExercisesModel(
-      id: 'stya',
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
       nameMuscle: muscle,
       nameExercise: '',
       days: [],
     );
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Adicionar Exercício'),
-          content: TextFormField(
-            initialValue: model?.nameExercise,
-            onChanged: (value) {
-              model = model!.copyWith(nameExercise: value);
-            },
+          content: Form(
+            key: formKey,
+            child: TextFormField(
+              controller: nameController,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Campo obrigatório';
+                }
+                return null;
+              },
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Cancel'),
+              child: const Text('Cancelar'),
             ),
             TextButton(
-              onPressed: () {
-                putExercises(model!);
-                Navigator.pop(context);
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  final updatedModel = model!.copyWith(
+                    nameExercise: nameController.text,
+                  );
+                  await putExercises(updatedModel);
+                  Navigator.pop(context);
+                }
               },
-              child: const Text('Save'),
+              child: const Text('Salvar'),
             ),
           ],
         );
@@ -60,30 +75,52 @@ class _ExercisesPageState extends State<ExercisesPage> {
     );
   }
 
-  Future<int?> addserie(int repps) async {
+  Future<int?> addSerie(int initialReps) async {
+    final formKey = GlobalKey<FormState>();
+    final repsController = TextEditingController(
+      text: initialReps.toString(),
+    );
+
     return showDialog<int>(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Total de repetições'),
-          content: TextFormField(
-            keyboardType: TextInputType.phone,
-            onChanged: (value) {
-              repps = int.parse(value);
-            },
+          content: Form(
+            key: formKey,
+            child: TextFormField(
+              controller: repsController,
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Campo obrigatório';
+                }
+                if (int.tryParse(value) == null) {
+                  return 'Digite um número válido';
+                }
+                final reps = int.parse(value);
+                if (reps <= 0) {
+                  return 'Digite um número maior que zero';
+                }
+                return null;
+              },
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Cancel'),
+              child: const Text('Cancelar'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(repps);
+                if (formKey.currentState!.validate()) {
+                  final reps = int.parse(repsController.text);
+                  Navigator.of(context).pop(reps);
+                }
               },
-              child: const Text('Save'),
+              child: const Text('Salvar'),
             ),
           ],
         );
@@ -96,20 +133,20 @@ class _ExercisesPageState extends State<ExercisesPage> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('delete $nameExercise'),
+            title: Text('deleta $nameExercise'),
             actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Não'),
+              ),
               TextButton(
                 onPressed: () {
                   deleteExercise(id, muscle);
                   Navigator.of(context).pop();
                 },
                 child: const Text('Sim'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Não'),
               )
             ],
           );
@@ -155,7 +192,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
                         children: exercises
                             .map((exercise) => ContainerExpand(
                                   exercise: exercise,
-                                  addserie: addserie,
+                                  addserie: addSerie,
                                   deleteDialog: deleteDialog,
                                 ))
                             .toList(),
@@ -164,7 +201,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
       }),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          addDialog();
+          addExercise();
         },
         child: const Icon(Icons.add),
       ),
