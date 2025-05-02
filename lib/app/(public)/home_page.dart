@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:registry_pull/app/core/widgets/muscle_title.dart';
+import 'package:registry_pull/app/core/constants/muscles.dart';
+import 'package:registry_pull/app/core/widgets/muscle_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -10,43 +11,58 @@ class HomePage extends StatelessWidget {
       body: SafeArea(
         child: Container(
           width: MediaQuery.of(context).size.width,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/images/gym4.png'), fit: BoxFit.cover),
-          ),
-          child: const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          decoration:
+              const BoxDecoration(color: Color.fromRGBO(255, 255, 255, 1)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'TREINOS',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 40,
-                  color: Colors.white,
-                  shadows: [
-                    Shadow(
-                        color: Colors.black87,
-                        offset: Offset(0, 2),
-                        blurRadius: 10),
-                  ],
+              Container(
+                margin: const EdgeInsets.only(left: 20, top: 50),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    tileMode: TileMode.mirror,
+                    colors: [Colors.orangeAccent, Colors.lightBlueAccent],
+                    begin: Alignment.centerLeft,
+                  ),
+                  color: Colors.blueAccent, // Cor de fundo
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'TREINOS',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 20,
+                    fontFamily: 'Roboto',
+                    color: Colors.white,
+                  ),
                 ),
               ),
-              SizedBox(
-                height: 40,
+              const SizedBox(
+                height: 50,
               ),
-              MuscleTitle(title: 'Braços'),
-              SizedBox(
-                height: 20,
+              const Padding(
+                padding: EdgeInsets.only(left: 20, top: 20),
+                child: Text(
+                  'A jornada começa aqui.',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
-              MuscleTitle(title: 'Peito'),
-              SizedBox(
-                height: 20,
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(20),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                  ),
+                  itemCount: muscles.length,
+                  itemBuilder: (context, index) {
+                    return MuscleWidget(muscle: muscles[index]);
+                  },
+                ),
               ),
-              MuscleTitle(title: 'Pernas'),
-              SizedBox(
-                height: 20,
-              ),
-              MuscleTitle(title: 'Costas'),
             ],
           ),
         ),
