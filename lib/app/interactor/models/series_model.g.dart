@@ -7,14 +7,12 @@ part of 'series_model.dart';
 // **************************************************************************
 
 SeriesModel _$SeriesModelFromJson(Map<String, dynamic> json) => SeriesModel(
-      id: json['id'] as int,
-      series: json['series'] as int,
-      repetitions: json['repetitions'] as int,
+      series: (json['series'] as num).toInt(),
+      repetitions: (json['repetitions'] as num).toInt(),
     );
 
 Map<String, dynamic> _$SeriesModelToJson(SeriesModel instance) =>
     <String, dynamic>{
-      'id': instance.id,
       'series': instance.series,
       'repetitions': instance.repetitions,
     };
