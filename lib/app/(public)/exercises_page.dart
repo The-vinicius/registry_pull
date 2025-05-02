@@ -1,7 +1,7 @@
 import 'package:asp/asp.dart';
 import 'package:flutter/material.dart';
-import 'package:registry_pull/app/core/widgets/show_pulls.dart';
-import 'package:registry_pull/app/interactor/actions/pull_action.dart';
+import 'package:registry_pull/app/core/widgets/container_expand.dart';
+import 'package:registry_pull/app/interactor/actions/exercises_action.dart';
 import 'package:registry_pull/app/interactor/atoms/exercise_atom.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
 import 'package:routefly/routefly.dart';
@@ -22,44 +22,133 @@ class _ExercisesPageState extends State<ExercisesPage> {
     super.initState();
   }
 
-  void addDialog([ExercisesModel? model]) {
+  void addExercise([ExercisesModel? model]) {
+    final formKey = GlobalKey<FormState>();
+    final nameController = TextEditingController();
+
     model ??= ExercisesModel(
-      id: -1,
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
       nameMuscle: muscle,
       nameExercise: '',
+      days: [],
     );
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          key: const Key('alerte'),
           title: const Text('Adicionar Exercício'),
-          content: TextFormField(
-            key: const Key('name_key'),
-            initialValue: model?.nameExercise,
-            onChanged: (value) {
-              model = model!.copyWith(nameExercise: value);
-            },
+          content: Form(
+            key: formKey,
+            child: TextFormField(
+              controller: nameController,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Campo obrigatório';
+                }
+                return null;
+              },
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Cancel'),
+              child: const Text('Cancelar'),
             ),
             TextButton(
-              key: const Key('save_key'),
-              onPressed: () {
-                putExercises(model!);
-                Navigator.pop(context);
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  final updatedModel = model!.copyWith(
+                    nameExercise: nameController.text,
+                  );
+                  await putExercises(updatedModel);
+                  Navigator.pop(context);
+                }
               },
-              child: const Text('Save'),
+              child: const Text('Salvar'),
             ),
           ],
         );
       },
     );
+  }
+
+  Future<int?> addSerie(int initialReps) async {
+    final formKey = GlobalKey<FormState>();
+    final repsController = TextEditingController();
+
+    return showDialog<int>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Total de repetições'),
+          content: Form(
+            key: formKey,
+            child: TextFormField(
+              controller: repsController,
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Campo obrigatório';
+                }
+                if (int.tryParse(value) == null) {
+                  return 'Digite um número válido';
+                }
+                final reps = int.parse(value);
+                if (reps <= 0) {
+                  return 'Digite um número maior que zero';
+                }
+                return null;
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (formKey.currentState!.validate()) {
+                  final reps = int.parse(repsController.text);
+                  Navigator.of(context).pop(reps);
+                }
+              },
+              child: const Text('Salvar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteDialog(String id, String muscle, String nameExercise) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('deleta $nameExercise'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Não'),
+              ),
+              TextButton(
+                onPressed: () {
+                  deleteExercise(id, muscle);
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Sim'),
+              )
+            ],
+          );
+        });
   }
 
   @override
@@ -81,12 +170,6 @@ class _ExercisesPageState extends State<ExercisesPage> {
             color: Colors.black,
           ),
         ),
-        actions: [
-          IconButton(
-              key: const Key('add'),
-              onPressed: addDialog,
-              icon: const Icon(Icons.add))
-        ],
       ),
       body: AtomBuilder(builder: (context, get) {
         final exercises = get(exerciseState);
@@ -99,20 +182,28 @@ class _ExercisesPageState extends State<ExercisesPage> {
                 ),
               )
             : SingleChildScrollView(
-                key: const Key('certo'),
                 child: loading.state
                     ? const Center(
                         child: CircularProgressIndicator(),
                       )
                     : Column(
                         children: exercises
-                            .map((exercise) => ShowPulls(
+                            .map((exercise) => ContainerExpand(
                                   exercise: exercise,
+                                  addserie: addSerie,
+                                  deleteDialog: deleteDialog,
                                 ))
                             .toList(),
                       ),
               );
       }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          addExercise();
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
+

@@ -7,10 +7,12 @@ part 'day_exercise_model.g.dart';
 class DayExerciseModel {
   final int id;
   final DateTime date;
+  final List<SeriesModel> series;
 
   DayExerciseModel({
     required this.id,
     required this.date,
+    required this.series,
   });
 
   factory DayExerciseModel.fromJson(Map<String, dynamic> json) =>
@@ -26,6 +28,7 @@ class DayExerciseModel {
     return DayExerciseModel(
       id: id ?? this.id,
       date: date ?? this.date,
+      series: series ?? this.series,
     );
   }
 }

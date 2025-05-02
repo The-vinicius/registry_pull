@@ -16,7 +16,7 @@ class MuscleWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withAlpha(51),
             blurRadius: 5,
             offset: const Offset(0, 5),
           ),
