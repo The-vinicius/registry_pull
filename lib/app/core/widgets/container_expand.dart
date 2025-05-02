@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:registry_pull/app/core/viewmodels/container_expand_viewmodel.dart';
 import 'package:registry_pull/app/core/widgets/list_date.dart';
 import 'package:registry_pull/app/core/widgets/list_series.dart';
-import 'package:registry_pull/app/interactor/actions/exercises_action.dart';
-import 'package:registry_pull/app/interactor/models/day_exercise_model.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
-import 'package:registry_pull/app/interactor/models/series_model.dart';
 
-class ContainerExpand extends StatefulWidget {
+class ContainerExpand extends StatelessWidget {
   const ContainerExpand({
     super.key,
     required this.exercise,
@@ -19,141 +18,79 @@ class ContainerExpand extends StatefulWidget {
   final Function(String, String, String) deleteDialog;
 
   @override
-  State<ContainerExpand> createState() => _ContainerExpandState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => ContainerExpandViewModel(
+        exercise: exercise,
+        addserie: addserie,
+        deleteDialog: deleteDialog,
+      ),
+      child: const _ContainerExpandContent(),
+    );
+  }
 }
 
-class _ContainerExpandState extends State<ContainerExpand> {
-  late int _selectedDayIndex;
-  late int _selectedSeriesIndex;
+class _ContainerExpandContent extends StatelessWidget {
+  const _ContainerExpandContent();
 
   @override
-  void initState() {
-    super.initState();
-    if (widget.exercise.days.isNotEmpty) {
-      // TODO: Verificar se o dia selecionado é o último
-      _selectedDayIndex = widget.exercise.days.length - 1;
-      _selectedSeriesIndex = 0;
-    } else {
-      _selectedDayIndex = 0;
-      _selectedSeriesIndex = 0;
-    }
-  }
+  Widget build(BuildContext context) {
+    final viewModel = context.watch<ContainerExpandViewModel>();
 
-  Future<bool?> _showDeleteConfirmationDialog() async {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Remover?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Deleta'),
-          ),
-        ],
-      ),
+    return ExpansionTile(
+      leading: IconButton(
+          onPressed: () => viewModel.deleteDialog(
+                viewModel.exercise.id,
+                viewModel.exercise.nameMuscle,
+                viewModel.exercise.nameExercise,
+              ),
+          icon: const Icon(Icons.delete)),
+      childrenPadding: const EdgeInsets.all(10),
+      title: Text(viewModel.exercise.nameExercise),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      expandedAlignment: Alignment.centerLeft,
+      children: [
+        const SizedBox(height: 20),
+        _buildDateSection(context),
+        const SizedBox(height: 20),
+        _buildSeriesSection(context),
+        const SizedBox(height: 20),
+        _buildRepetitionsSection(context),
+      ],
     );
   }
-  
-  void _handleDaySelection(int index, bool isDay) {
-    setState(() {
-      if (isDay) {
-        _selectedDayIndex = index;
-        _selectedSeriesIndex = 0;
-      } else {
-        _selectedSeriesIndex = index;
-      }
-    });
-  }
 
-  Future<void> _addNewDay() async {
-    final newDay = DayExerciseModel(
-      id: widget.exercise.days.isEmpty ? 0 : widget.exercise.days.last!.id + 1,
-      date: DateTime.now(),
-      series: [],
-    );
+  Widget _buildDateSection(BuildContext context) {
+    final viewModel = context.watch<ContainerExpandViewModel>();
 
-    widget.exercise.days.add(newDay);
-    await putDay(widget.exercise);
-    setState(() {
-      _selectedDayIndex = widget.exercise.days.length - 1;
-      _selectedSeriesIndex = 0;
-    });
-  }
-
-  Future<void> _removeLastDay() async {
-    final shouldDelete = await _showDeleteConfirmationDialog();
-    if (shouldDelete == true) {
-      widget.exercise.days.removeLast();
-      removeDay(
-        widget.exercise.nameMuscle,
-        widget.exercise.id,
-        widget.exercise.days,
-      );
-      setState(() {
-        _selectedDayIndex = widget.exercise.days.length - 1;
-        _selectedSeriesIndex = 0;
-      });
-    }
-  }
-
-  Future<void> _addNewSeries() async {
-    final repps = await widget.addserie(0);
-    if (repps != null) {
-      final newSeries = SeriesModel(
-        series: widget.exercise.days[_selectedDayIndex]!.series.isEmpty
-            ? 0
-            : widget.exercise.days[_selectedDayIndex]!.series.length,
-        repetitions: repps,
-      );
-
-      widget.exercise.days[_selectedDayIndex]!.series.add(newSeries);
-      await putDay(widget.exercise);
-      setState(() {
-        _selectedSeriesIndex =
-            widget.exercise.days[_selectedDayIndex]!.series.length - 1;
-      });
-    }
-  }
-
-  Future<void> _removeLastSeries() async {
-    final shouldDelete = await _showDeleteConfirmationDialog();
-    if (shouldDelete == true) {
-      widget.exercise.days[_selectedDayIndex]!.series.removeLast();
-      await removeDay(
-        widget.exercise.nameMuscle,
-        widget.exercise.id,
-        widget.exercise.days,
-      );
-      setState(() {
-        _selectedSeriesIndex =
-            widget.exercise.days[_selectedDayIndex]!.series.length - 1;
-      });
-    }
-  }
-
-  Widget _buildDateSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Data'),
+        const Text('Dias',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
         SingleChildScrollView(
           reverse: true,
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
               ...listDate(
-                  widget.exercise.days, _selectedDayIndex, _handleDaySelection),
+                viewModel.exercise.days,
+                viewModel.selectedDayIndex,
+                viewModel.handleDaySelection,
+              ),
               IconButton(
-                onPressed: _addNewDay,
+                onPressed: viewModel.addNewDay,
                 icon: const Icon(Icons.add_circle_outline),
               ),
-              if (widget.exercise.days.isNotEmpty)
+              if (viewModel.hasDays)
                 IconButton(
-                  onPressed: _removeLastDay,
+                  onPressed: () async {
+                    final shouldDelete =
+                        await viewModel.showDeleteConfirmationDialog(context);
+                    if (shouldDelete == true) {
+                      await viewModel.removeLastDay();
+                    }
+                  },
                   icon: const Icon(Icons.delete),
                 ),
             ],
@@ -163,30 +100,38 @@ class _ContainerExpandState extends State<ContainerExpand> {
     );
   }
 
-  Widget _buildSeriesSection() {
-    if (widget.exercise.days.isEmpty) return const SizedBox.shrink();
+  Widget _buildSeriesSection(BuildContext context) {
+    final viewModel = context.watch<ContainerExpandViewModel>();
+    if (!viewModel.hasDays) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Series'),
+        const Text('Series',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
         SingleChildScrollView(
           reverse: true,
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
               ...listSeries(
-                widget.exercise.days[_selectedDayIndex]!.series,
-                _selectedSeriesIndex,
-                _handleDaySelection,
+                viewModel.exercise.days[viewModel.selectedDayIndex]!.series,
+                viewModel.selectedSeriesIndex,
+                viewModel.handleDaySelection,
               ),
               IconButton(
-                onPressed: _addNewSeries,
+                onPressed: viewModel.addNewSeries,
                 icon: const Icon(Icons.add_circle_outlined),
               ),
-              if (widget.exercise.days[_selectedDayIndex]!.series.isNotEmpty)
+              if (viewModel.hasSeries)
                 IconButton(
-                  onPressed: _removeLastSeries,
+                  onPressed: () async {
+                    final shouldDelete =
+                        await viewModel.showDeleteConfirmationDialog(context);
+                    if (shouldDelete == true) {
+                      await viewModel.removeLastSeries();
+                    }
+                  },
                   icon: const Icon(Icons.delete),
                 ),
             ],
@@ -196,58 +141,34 @@ class _ContainerExpandState extends State<ContainerExpand> {
     );
   }
 
-  Widget _buildRepetitionsSection() {
-    if (widget.exercise.days.isEmpty ||
-        widget.exercise.days[_selectedDayIndex]!.series.isEmpty) {
-      return const SizedBox.shrink();
-    }
+  Widget _buildRepetitionsSection(BuildContext context) {
+    final viewModel = context.watch<ContainerExpandViewModel>();
+    if (!viewModel.hasSeries) return const SizedBox.shrink();
 
-    final repetitions = widget.exercise.days[_selectedDayIndex]!
-        .series[_selectedSeriesIndex].repetitions;
+    final repetitions = viewModel.selectedSeries?.repetitions ?? 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Repetições: $repetitions'),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: List.generate(
-              repetitions,
-              (index) => Container(
-                margin: const EdgeInsets.only(right: 5),
-                height: 50,
-                width: 10,
-                color: Colors.red,
+        RichText(
+            text: TextSpan(
+          text: 'Repetições: ',
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+          children: [
+            TextSpan(
+              text: '$repetitions',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
               ),
             ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ExpansionTile(
-      childrenPadding: const EdgeInsets.all(10),
-      title: GestureDetector(
-        onLongPress: () => widget.deleteDialog(
-          widget.exercise.id,
-          widget.exercise.nameMuscle,
-          widget.exercise.nameExercise,
-        ),
-        child: Text(widget.exercise.nameExercise),
-      ),
-      expandedCrossAxisAlignment: CrossAxisAlignment.start,
-      expandedAlignment: Alignment.centerLeft,
-      children: [
-        const SizedBox(height: 20),
-        _buildDateSection(),
-        const SizedBox(height: 20),
-        _buildSeriesSection(),
-        const SizedBox(height: 20),
-        _buildRepetitionsSection(),
+          ],
+        )),
       ],
     );
   }
