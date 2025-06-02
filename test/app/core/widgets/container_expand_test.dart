@@ -17,7 +17,11 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       home: Scaffold(
-        body: ContainerExpand(exercise: exercise),
+        body: ContainerExpand(
+          exercise: exercise,
+          addserie: addSeries,
+          deleteDialog: (p0, p1, p2) => {},
+        ),
       ),
     ));
     // tester.pumpAndSettle();
@@ -33,7 +37,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('braços')));
+    await tester.tap(find.byKey(const Key('Braços')));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('add')));
@@ -49,6 +53,11 @@ void main() {
     await tester.tap(find.byKey(const Key('save_key')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('certo')), findsOneWidget);
+    expect(find.text('paralelas'), findsOneWidget);
   }, tags: 'pages');
 }
+
+Future<int> addSeries(int rep) async {
+  return 10;
+}
+
