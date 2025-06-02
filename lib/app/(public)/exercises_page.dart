@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:asp/asp.dart';
 import 'package:flutter/material.dart';
 import 'package:registry_pull/app/core/widgets/container_expand.dart';
@@ -41,6 +43,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
           content: Form(
             key: formKey,
             child: TextFormField(
+              key: const Key('name_key'),
               controller: nameController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -58,13 +61,16 @@ class _ExercisesPageState extends State<ExercisesPage> {
               child: const Text('Cancelar'),
             ),
             TextButton(
+              key: const Key('save_key'),
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
                   final updatedModel = model!.copyWith(
                     nameExercise: nameController.text,
                   );
                   await putExercises(updatedModel);
-                  Navigator.pop(context);
+                  if (context.mounted) {
+                      Navigator.pop(context);
+                  }
                 }
               },
               child: const Text('Salvar'),
@@ -126,8 +132,9 @@ class _ExercisesPageState extends State<ExercisesPage> {
     );
   }
 
-  void deleteDialog(String id, String muscle, String nameExercise) {
-    showDialog(
+  Future<bool?> deleteDialog(
+      String id, String muscle, String nameExercise) async {
+    return showDialog<bool>(
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -135,14 +142,14 @@ class _ExercisesPageState extends State<ExercisesPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(false);
                 },
                 child: const Text('Não'),
               ),
               TextButton(
                 onPressed: () {
                   deleteExercise(id, muscle);
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(true);
                 },
                 child: const Text('Sim'),
               )
@@ -188,16 +195,38 @@ class _ExercisesPageState extends State<ExercisesPage> {
                       )
                     : Column(
                         children: exercises
-                            .map((exercise) => ContainerExpand(
-                                  exercise: exercise,
-                                  addserie: addSerie,
-                                  deleteDialog: deleteDialog,
+                            .map((exercise) => Dismissible(
+                                  key: Key(exercise.id),
+                                  background: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Icon(Icons.delete),
+                                  ),
+                                  direction: DismissDirection.endToStart,
+                                  dismissThresholds: const {
+                                    DismissDirection.endToStart: 0.5,
+                                  },
+                                  confirmDismiss: (direction) async {
+                                    var confirm = await deleteDialog(
+                                        exercise.id,
+                                        exercise.nameMuscle,
+                                        exercise.nameExercise);
+                                    return confirm;
+                                  },
+                                  child: ContainerExpand(
+                                    exercise: exercise,
+                                    addserie: addSerie,
+                                    deleteDialog: deleteDialog,
+                                  ),
                                 ))
                             .toList(),
                       ),
               );
       }),
       floatingActionButton: FloatingActionButton(
+        key: const Key('add'),
         onPressed: () {
           addExercise();
         },
@@ -206,4 +235,3 @@ class _ExercisesPageState extends State<ExercisesPage> {
     );
   }
 }
-

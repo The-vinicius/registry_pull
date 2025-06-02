@@ -16,26 +16,28 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                margin: const EdgeInsets.only(left: 20, top: 50),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    tileMode: TileMode.mirror,
-                    colors: [Colors.orangeAccent, Colors.lightBlueAccent],
-                    begin: Alignment.centerLeft,
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 50),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      tileMode: TileMode.mirror,
+                      colors: [Colors.orangeAccent, Colors.lightBlueAccent],
+                      begin: Alignment.centerLeft,
+                    ),
+                    color: Colors.blueAccent, // Cor de fundo
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  color: Colors.blueAccent, // Cor de fundo
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  'TREINOS',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 20,
-                    fontFamily: 'Roboto',
-                    color: Colors.white,
+                  child: const Text(
+                    'TREINOS',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 20,
+                      fontFamily: 'Roboto',
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),

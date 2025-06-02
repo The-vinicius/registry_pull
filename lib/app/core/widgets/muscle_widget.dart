@@ -23,6 +23,7 @@ class MuscleWidget extends StatelessWidget {
         ],
       ),
       child: TextButton(
+        key: Key(muscle),
         style: TextButton.styleFrom(
           backgroundColor: Colors.transparent,
           padding: const EdgeInsets.all(16),
