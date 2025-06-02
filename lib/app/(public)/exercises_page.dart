@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:asp/asp.dart';
 import 'package:flutter/material.dart';
 import 'package:registry_pull/app/core/widgets/container_expand.dart';
