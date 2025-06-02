@@ -4,6 +4,7 @@ import 'package:registry_pull/app/states/container_expand_viewmodel.dart';
 import 'package:registry_pull/app/core/widgets/list_date.dart';
 import 'package:registry_pull/app/core/widgets/list_series.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
+import 'package:registry_pull/app/core/widgets/card_expansion.dart';
 
 class ContainerExpand extends StatelessWidget {
   const ContainerExpand({
@@ -36,27 +37,22 @@ class _ContainerExpandContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ContainerExpandViewModel>();
-
-    return ExpansionTile(
-      leading: IconButton(
-          onPressed: () => viewModel.deleteDialog(
-                viewModel.exercise.id,
-                viewModel.exercise.nameMuscle,
-                viewModel.exercise.nameExercise,
-              ),
-          icon: const Icon(Icons.delete)),
-      childrenPadding: const EdgeInsets.all(10),
+    return CardExpansion(
+      key: const Key('expansion'),
       title: Text(viewModel.exercise.nameExercise),
-      expandedCrossAxisAlignment: CrossAxisAlignment.start,
-      expandedAlignment: Alignment.centerLeft,
-      children: [
-        const SizedBox(height: 20),
-        _buildDateSection(context),
-        const SizedBox(height: 20),
-        _buildSeriesSection(context),
-        const SizedBox(height: 20),
-        _buildRepetitionsSection(context),
-      ],
+      child: Padding(
+        padding: const EdgeInsets.all(5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDateSection(context),
+            const SizedBox(height: 20),
+            _buildSeriesSection(context),
+            const SizedBox(height: 20),
+            _buildRepetitionsSection(context),
+          ],
+        ),
+      ),
     );
   }
 
@@ -72,29 +68,55 @@ class _ContainerExpandContent extends StatelessWidget {
           reverse: true,
           scrollDirection: Axis.horizontal,
           child: Row(
+            spacing: 4,
             children: [
               ...listDate(
                 viewModel.exercise.days,
                 viewModel.selectedDayIndex,
                 viewModel.handleDaySelection,
               ),
-              IconButton(
-                onPressed: viewModel.addNewDay,
-                icon: const Icon(Icons.add_circle_outline),
-              ),
-              if (viewModel.hasDays)
-                IconButton(
-                  onPressed: () async {
-                    final shouldDelete =
-                        await viewModel.showDeleteConfirmationDialog(context);
-                    if (shouldDelete == true) {
-                      await viewModel.removeLastDay();
-                    }
-                  },
-                  icon: const Icon(Icons.delete),
-                ),
             ],
           ),
+        ),
+        Row(
+          spacing: 4,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                side:
+                    const BorderSide(color: Color.fromRGBO(196, 142, 239, .86)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+              onPressed: viewModel.addNewDay,
+              child: RichText(
+                text: const TextSpan(
+                  children: [
+                    TextSpan(
+                        text: '+', style: TextStyle(color: Colors.deepPurple)),
+                    TextSpan(
+                      text: " Adicionar",
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (viewModel.hasDays)
+              IconButton(
+                onPressed: () async {
+                  final shouldDelete =
+                      await viewModel.showDeleteConfirmationDialog(context);
+                  if (shouldDelete == true) {
+                    await viewModel.removeLastDay();
+                  }
+                },
+                icon: const Icon(Icons.delete),
+              ),
+          ],
         ),
       ],
     );
@@ -105,6 +127,7 @@ class _ContainerExpandContent extends StatelessWidget {
     if (!viewModel.hasDays) return const SizedBox.shrink();
 
     return Column(
+      spacing: 4,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Series',
@@ -113,29 +136,49 @@ class _ContainerExpandContent extends StatelessWidget {
           reverse: true,
           scrollDirection: Axis.horizontal,
           child: Row(
+            spacing: 4,
             children: [
               ...listSeries(
                 viewModel.exercise.days[viewModel.selectedDayIndex]!.series,
                 viewModel.selectedSeriesIndex,
                 viewModel.handleDaySelection,
               ),
-              IconButton(
-                onPressed: viewModel.addNewSeries,
-                icon: const Icon(Icons.add_circle_outlined),
-              ),
-              if (viewModel.hasSeries)
-                IconButton(
-                  onPressed: () async {
-                    final shouldDelete =
-                        await viewModel.showDeleteConfirmationDialog(context);
-                    if (shouldDelete == true) {
-                      await viewModel.removeLastSeries();
-                    }
-                  },
-                  icon: const Icon(Icons.delete),
-                ),
             ],
           ),
+        ),
+        Row(
+          spacing: 4,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                side:
+                    const BorderSide(color: Color.fromRGBO(196, 142, 239, .86)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+              onPressed: viewModel.addNewSeries,
+              child: const Icon(Icons.add),
+            ),
+            if (viewModel.hasSeries)
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  side: const BorderSide(
+                      color: Color.fromRGBO(196, 142, 239, .86)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+                onPressed: () async {
+                  final shouldDelete =
+                      await viewModel.showDeleteConfirmationDialog(context);
+                  if (shouldDelete == true) {
+                    await viewModel.removeLastSeries();
+                  }
+                },
+                child: const Icon(Icons.remove),
+              ),
+          ],
         ),
       ],
     );
@@ -148,27 +191,32 @@ class _ContainerExpandContent extends StatelessWidget {
     final repetitions = viewModel.selectedSeries?.repetitions ?? 0;
 
     return Column(
+      spacing: 4,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RichText(
-            text: TextSpan(
-          text: 'Repetições: ',
-          style: const TextStyle(
+            text: const TextSpan(
+          text: 'Repetições',
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: Colors.black,
           ),
-          children: [
-            TextSpan(
-              text: '$repetitions',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
-            ),
-          ],
         )),
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            border: Border.all(color: const Color.fromRGBO(196, 142, 239, .86)),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Text(
+              '$repetitions',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+          ),
+        )
       ],
     );
   }
