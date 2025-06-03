@@ -4,6 +4,7 @@ import 'package:registry_pull/app/core/widgets/container_expand.dart';
 import 'package:registry_pull/app/interactor/actions/exercises_action.dart';
 import 'package:registry_pull/app/interactor/atoms/exercise_atom.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
+import 'package:registry_pull/l10n/app_localizations.dart';
 import 'package:routefly/routefly.dart';
 
 class ExercisesPage extends StatefulWidget {
@@ -25,6 +26,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
   void addExercise([ExercisesModel? model]) {
     final formKey = GlobalKey<FormState>();
     final nameController = TextEditingController();
+    final loc = AppLocalizations.of(context)!;
 
     model ??= ExercisesModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -37,7 +39,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Adicionar Exercício'),
+          title: Text(loc.addExercise),
           content: Form(
             key: formKey,
             child: TextFormField(
@@ -45,7 +47,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
               controller: nameController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Campo obrigatório';
+                  return loc.requiredField;
                 }
                 return null;
               },
@@ -56,7 +58,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Cancelar'),
+              child: Text(loc.cancel),
             ),
             TextButton(
               key: const Key('save_key'),
@@ -67,11 +69,11 @@ class _ExercisesPageState extends State<ExercisesPage> {
                   );
                   await putExercises(updatedModel);
                   if (context.mounted) {
-                      Navigator.pop(context);
+                    Navigator.pop(context);
                   }
                 }
               },
-              child: const Text('Salvar'),
+              child: Text(loc.save),
             ),
           ],
         );
@@ -82,12 +84,13 @@ class _ExercisesPageState extends State<ExercisesPage> {
   Future<int?> addSerie(int initialReps) async {
     final formKey = GlobalKey<FormState>();
     final repsController = TextEditingController();
+    final loc = AppLocalizations.of(context)!;
 
     return showDialog<int>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Total de repetições'),
+          title: Text(loc.totalRep),
           content: Form(
             key: formKey,
             child: TextFormField(
@@ -95,14 +98,14 @@ class _ExercisesPageState extends State<ExercisesPage> {
               keyboardType: TextInputType.number,
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Campo obrigatório';
+                  return loc.requiredField;
                 }
                 if (int.tryParse(value) == null) {
-                  return 'Digite um número válido';
+                  return loc.invalidNumber;
                 }
                 final reps = int.parse(value);
                 if (reps <= 0) {
-                  return 'Digite um número maior que zero';
+                  return loc.gtZero;
                 }
                 return null;
               },
@@ -113,7 +116,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Cancelar'),
+              child: Text(loc.cancel),
             ),
             TextButton(
               onPressed: () {
@@ -122,7 +125,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
                   Navigator.of(context).pop(reps);
                 }
               },
-              child: const Text('Salvar'),
+              child: Text(loc.save),
             ),
           ],
         );
@@ -132,24 +135,25 @@ class _ExercisesPageState extends State<ExercisesPage> {
 
   Future<bool?> deleteDialog(
       String id, String muscle, String nameExercise) async {
+    final loc = AppLocalizations.of(context)!;
     return showDialog<bool>(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('deleta $nameExercise'),
+            title: Text('${loc.delete} $nameExercise'),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop(false);
                 },
-                child: const Text('Não'),
+                child: Text(loc.no),
               ),
               TextButton(
                 onPressed: () {
                   deleteExercise(id, muscle);
                   Navigator.of(context).pop(true);
                 },
-                child: const Text('Sim'),
+                child: Text(loc.yes),
               )
             ],
           );
@@ -158,6 +162,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -166,10 +171,10 @@ class _ExercisesPageState extends State<ExercisesPage> {
           },
           icon: const Icon(Icons.keyboard_arrow_left_sharp),
         ),
-        title: const Text(
-          'Exercícios',
+        title: Text(
+          loc.exercises,
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 30,
             color: Colors.black,
@@ -179,9 +184,9 @@ class _ExercisesPageState extends State<ExercisesPage> {
       body: AtomBuilder(builder: (context, get) {
         final exercises = get(exerciseState);
         return exercises.isEmpty
-            ? const Center(
+            ? Center(
                 child: Text(
-                  'Vá Treinar',
+                  loc.goTrain,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -196,11 +201,13 @@ class _ExercisesPageState extends State<ExercisesPage> {
                             .map((exercise) => Dismissible(
                                   key: Key(exercise.id),
                                   background: Container(
+                                    alignment: Alignment.centerRight,
                                     decoration: BoxDecoration(
-                                      color: Colors.red,
+                                      color: Colors.deepPurple,
                                       borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: const Icon(Icons.delete),
+                                    child: const Icon(Icons.delete,
+                                        color: Colors.white, size: 30),
                                   ),
                                   direction: DismissDirection.endToStart,
                                   dismissThresholds: const {
