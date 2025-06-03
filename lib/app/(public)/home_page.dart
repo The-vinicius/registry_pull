@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:registry_pull/app/core/constants/muscles.dart';
 import 'package:registry_pull/app/core/widgets/muscle_widget.dart';
+import 'package:registry_pull/l10n/app_localizations.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    List<String> localMuscles = [
+      loc.arms,
+      loc.chest,
+      loc.legs,
+      loc.back,
+    ];
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -30,9 +38,9 @@ class HomePage extends StatelessWidget {
                     color: Colors.blueAccent, // Cor de fundo
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
-                    'TREINOS',
-                    style: TextStyle(
+                  child: Text(
+                    loc.workouts,
+                    style: const TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 20,
                       fontFamily: 'Roboto',
@@ -44,11 +52,11 @@ class HomePage extends StatelessWidget {
               const SizedBox(
                 height: 50,
               ),
-              const Padding(
-                padding: EdgeInsets.only(left: 20, top: 20),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, top: 20),
                 child: Text(
-                  'A jornada começa aqui.',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  loc.description,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               Expanded(
@@ -61,7 +69,9 @@ class HomePage extends StatelessWidget {
                   ),
                   itemCount: muscles.length,
                   itemBuilder: (context, index) {
-                    return MuscleWidget(muscle: muscles[index]);
+                    return MuscleWidget(
+                        muscle: muscles[index],
+                        localMuscle: localMuscles[index]);
                   },
                 ),
               ),

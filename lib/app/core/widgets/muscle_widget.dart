@@ -5,7 +5,9 @@ import 'package:routefly/routefly.dart';
 
 class MuscleWidget extends StatelessWidget {
   final String muscle;
-  const MuscleWidget({super.key, required this.muscle});
+  final String localMuscle;
+  const MuscleWidget(
+      {super.key, required this.muscle, required this.localMuscle});
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +44,7 @@ class MuscleWidget extends StatelessWidget {
                 child: Image.asset('assets/muscle/$path.png')),
             const Spacer(),
             Text(
-              muscle.toUpperCase(),
+              localMuscle.toUpperCase(),
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,

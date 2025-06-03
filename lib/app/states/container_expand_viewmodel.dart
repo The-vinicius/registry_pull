@@ -3,6 +3,7 @@ import 'package:registry_pull/app/interactor/actions/exercises_action.dart';
 import 'package:registry_pull/app/interactor/models/day_exercise_model.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
 import 'package:registry_pull/app/interactor/models/series_model.dart';
+import 'package:registry_pull/l10n/app_localizations.dart';
 
 class ContainerExpandViewModel extends ChangeNotifier {
   final ExercisesModel exercise;
@@ -34,19 +35,19 @@ class ContainerExpandViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool?> showDeleteConfirmationDialog(BuildContext context) async {
+  Future<bool?> showDeleteConfirmationDialog(BuildContext context, AppLocalizations loc) async {
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Remover?'),
+        title: Text('${loc.remove}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(loc.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Deleta'),
+            child: Text(loc.delete),
           ),
         ],
       ),
@@ -69,7 +70,7 @@ class ContainerExpandViewModel extends ChangeNotifier {
       date: DateTime.now(),
       series: [],
     );
-    
+
     exercise.days.add(newDay);
     await putDay(exercise);
     _selectedDayIndex = exercise.days.length - 1;
@@ -98,10 +99,11 @@ class ContainerExpandViewModel extends ChangeNotifier {
             : exercise.days[_selectedDayIndex]!.series.length,
         repetitions: repps,
       );
-      
+
       exercise.days[_selectedDayIndex]!.series.add(newSeries);
       await putDay(exercise);
-      _selectedSeriesIndex = exercise.days[_selectedDayIndex]!.series.length - 1;
+      _selectedSeriesIndex =
+          exercise.days[_selectedDayIndex]!.series.length - 1;
       notifyListeners();
     }
   }
@@ -118,8 +120,13 @@ class ContainerExpandViewModel extends ChangeNotifier {
   }
 
   bool get hasDays => exercise.days.isNotEmpty;
-  bool get hasSeries => hasDays && exercise.days[_selectedDayIndex]!.series.isNotEmpty;
-  
-  DayExerciseModel? get selectedDay => hasDays ? exercise.days[_selectedDayIndex] : null;
-  SeriesModel? get selectedSeries => hasSeries ? exercise.days[_selectedDayIndex]!.series[_selectedSeriesIndex] : null;
-} 
+  bool get hasSeries =>
+      hasDays && exercise.days[_selectedDayIndex]!.series.isNotEmpty;
+
+  DayExerciseModel? get selectedDay =>
+      hasDays ? exercise.days[_selectedDayIndex] : null;
+  SeriesModel? get selectedSeries => hasSeries
+      ? exercise.days[_selectedDayIndex]!.series[_selectedSeriesIndex]
+      : null;
+}
+

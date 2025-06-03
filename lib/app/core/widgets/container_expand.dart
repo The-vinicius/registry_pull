@@ -5,6 +5,7 @@ import 'package:registry_pull/app/core/widgets/list_date.dart';
 import 'package:registry_pull/app/core/widgets/list_series.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
 import 'package:registry_pull/app/core/widgets/card_expansion.dart';
+import 'package:registry_pull/l10n/app_localizations.dart';
 
 class ContainerExpand extends StatelessWidget {
   const ContainerExpand({
@@ -36,8 +37,10 @@ class _ContainerExpandContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final viewModel = context.watch<ContainerExpandViewModel>();
     return CardExpansion(
+      margin: const EdgeInsets.all(3),
       key: const Key('expansion'),
       title: Text(viewModel.exercise.nameExercise),
       child: Padding(
@@ -45,25 +48,25 @@ class _ContainerExpandContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDateSection(context),
+            _buildDateSection(context, loc),
             const SizedBox(height: 20),
-            _buildSeriesSection(context),
+            _buildSeriesSection(context, loc),
             const SizedBox(height: 20),
-            _buildRepetitionsSection(context),
+            _buildRepetitionsSection(context, loc),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDateSection(BuildContext context) {
+  Widget _buildDateSection(BuildContext context, AppLocalizations loc) {
     final viewModel = context.watch<ContainerExpandViewModel>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Dias',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+        Text(loc.days,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
         SingleChildScrollView(
           reverse: true,
           scrollDirection: Axis.horizontal,
@@ -91,13 +94,13 @@ class _ContainerExpandContent extends StatelessWidget {
               ),
               onPressed: viewModel.addNewDay,
               child: RichText(
-                text: const TextSpan(
+                text: TextSpan(
                   children: [
-                    TextSpan(
+                    const TextSpan(
                         text: '+', style: TextStyle(color: Colors.deepPurple)),
                     TextSpan(
-                      text: " Adicionar",
-                      style: TextStyle(
+                      text: " ${loc.add}",
+                      style: const TextStyle(
                         color: Colors.black,
                       ),
                     ),
@@ -109,7 +112,7 @@ class _ContainerExpandContent extends StatelessWidget {
               IconButton(
                 onPressed: () async {
                   final shouldDelete =
-                      await viewModel.showDeleteConfirmationDialog(context);
+                      await viewModel.showDeleteConfirmationDialog(context, loc);
                   if (shouldDelete == true) {
                     await viewModel.removeLastDay();
                   }
@@ -122,7 +125,7 @@ class _ContainerExpandContent extends StatelessWidget {
     );
   }
 
-  Widget _buildSeriesSection(BuildContext context) {
+  Widget _buildSeriesSection(BuildContext context, AppLocalizations loc) {
     final viewModel = context.watch<ContainerExpandViewModel>();
     if (!viewModel.hasDays) return const SizedBox.shrink();
 
@@ -130,8 +133,8 @@ class _ContainerExpandContent extends StatelessWidget {
       spacing: 4,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Series',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+        Text(loc.series,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
         SingleChildScrollView(
           reverse: true,
           scrollDirection: Axis.horizontal,
@@ -171,7 +174,7 @@ class _ContainerExpandContent extends StatelessWidget {
                 ),
                 onPressed: () async {
                   final shouldDelete =
-                      await viewModel.showDeleteConfirmationDialog(context);
+                      await viewModel.showDeleteConfirmationDialog(context, loc);
                   if (shouldDelete == true) {
                     await viewModel.removeLastSeries();
                   }
@@ -184,7 +187,7 @@ class _ContainerExpandContent extends StatelessWidget {
     );
   }
 
-  Widget _buildRepetitionsSection(BuildContext context) {
+  Widget _buildRepetitionsSection(BuildContext context, AppLocalizations loc) {
     final viewModel = context.watch<ContainerExpandViewModel>();
     if (!viewModel.hasSeries) return const SizedBox.shrink();
 
@@ -195,9 +198,9 @@ class _ContainerExpandContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RichText(
-            text: const TextSpan(
-          text: 'Repetições',
-          style: TextStyle(
+            text: TextSpan(
+          text: loc.repetitions,
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: Colors.black,
