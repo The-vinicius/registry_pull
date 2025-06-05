@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:registry_pull/app/core/constants/muscles.dart';
 import 'package:registry_pull/app/core/widgets/muscle_widget.dart';
+import 'package:registry_pull/app/interactor/atoms/exercise_atom.dart';
 import 'package:registry_pull/l10n/app_localizations.dart';
 
 class HomePage extends StatelessWidget {
@@ -22,20 +23,18 @@ class HomePage extends StatelessWidget {
           decoration:
               const BoxDecoration(color: Color.fromRGBO(255, 255, 255, 1)),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Center(
                 child: Container(
                   margin: const EdgeInsets.only(top: 50),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      tileMode: TileMode.mirror,
-                      colors: [Colors.orangeAccent, Colors.lightBlueAccent],
-                      begin: Alignment.centerLeft,
+                    border: Border.all(
+                      color: Colors.black.withAlpha(51),
+                      width: 1,
                     ),
-                    color: Colors.blueAccent, // Cor de fundo
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -44,7 +43,7 @@ class HomePage extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                       fontSize: 20,
                       fontFamily: 'Roboto',
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                 ),
@@ -52,12 +51,47 @@ class HomePage extends StatelessWidget {
               const SizedBox(
                 height: 50,
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20, top: 20),
-                child: Text(
-                  loc.description,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20, top: 20),
+                    child: Text(
+                      loc.description,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const Spacer(),
+                  ValueListenableBuilder(
+                      valueListenable: selectedMuscle,
+                      builder: (context, value, child) {
+                        if (value.isEmpty) {
+                          return const Text('');
+                        }
+                        return Column(
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(right: 20),
+                              child: Text(loc.lastTraining),
+                            ),
+                            Container(
+                                margin: const EdgeInsets.only(right: 20),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black),
+                                    borderRadius: BorderRadius.circular(20)),
+                                width: 50,
+                                height: 50,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5),
+                                  child: Image.asset(
+                                    'assets/muscle/${iconM[value]}.png',
+                                    width: 50,
+                                    height: 50,
+                                  ),
+                                )),
+                          ],
+                        );
+                      }),
+                ],
               ),
               Expanded(
                 child: GridView.builder(

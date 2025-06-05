@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:registry_pull/app/core/widgets/container_expand.dart';
 import 'package:registry_pull/app/injector.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:registry_pull/l10n/app_localizations.dart';
 import 'package:registry_pull/routes.dart';
 import 'package:routefly/routefly.dart';
 
@@ -16,6 +18,17 @@ void main() {
     );
 
     await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate, // seu delegate gerado
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('pt'),
+      ],
+      locale: const Locale('pt'),
       home: Scaffold(
         body: ContainerExpand(
           exercise: exercise,
@@ -26,12 +39,23 @@ void main() {
     ));
     // tester.pumpAndSettle();
     expect(find.byKey(const Key('expansion')), findsOneWidget);
-  }, tags: 'pages');
+  });
 
   testWidgets('add ex', (tester) async {
     registerInstances();
     await tester.pumpWidget(
       MaterialApp.router(
+        localizationsDelegates: const [
+        AppLocalizations.delegate, // seu delegate gerado
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('pt'),
+      ],
+      locale: const Locale('pt'),
         routerConfig: Routefly.routerConfig(
             routes: routes, initialPath: routePaths.splash),
       ),
@@ -54,10 +78,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('paralelas'), findsOneWidget);
-  }, tags: 'pages');
+  });
 }
 
 Future<int> addSeries(int rep) async {
   return 10;
 }
-

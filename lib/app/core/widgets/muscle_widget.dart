@@ -14,15 +14,11 @@ class MuscleWidget extends StatelessWidget {
     final path = iconM[muscle];
     return Container(
       decoration: BoxDecoration(
-        color: Colors.lightBlueAccent,
+        border: Border.all(
+          color: Colors.black.withAlpha(51),
+          width: 1,
+        ),
         borderRadius: BorderRadius.circular(4),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(51),
-            blurRadius: 5,
-            offset: const Offset(0, 5),
-          ),
-        ],
       ),
       child: TextButton(
         key: Key(muscle),
@@ -37,18 +33,17 @@ class MuscleWidget extends StatelessWidget {
           Routefly.pushNavigate(routePaths.exercises, arguments: muscle);
         },
         child: Column(
+          spacing: 8,
           children: [
-            SizedBox(
-                width: 50,
-                height: 70,
-                child: Image.asset('assets/muscle/$path.png')),
-            const Spacer(),
+            Expanded(
+                child:
+                    Image.asset('assets/muscle/$path.png', fit: BoxFit.cover)),
             Text(
               localMuscle.toUpperCase(),
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Colors.deepPurpleAccent,
               ),
             ),
           ],

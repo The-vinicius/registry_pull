@@ -1,8 +1,10 @@
 import 'package:registry_pull/app/injector.dart';
 import 'package:registry_pull/app/interactor/atoms/actions.dart';
+import 'package:registry_pull/app/interactor/atoms/exercise_atom.dart';
 import 'package:registry_pull/app/interactor/models/day_exercise_model.dart';
 import 'package:registry_pull/app/interactor/models/exercises_model.dart';
 import 'package:registry_pull/app/interactor/repositories/exercises_repository.dart';
+import 'package:registry_pull/app/interactor/repositories/last_mucle_repository.dart';
 
 Future<void> putExercises(ExercisesModel model) async {
   final repository = injector.get<ExercisesRepository>();
@@ -35,3 +37,13 @@ Future<void> removeDay(
   await repository.deleteDayExercise(muscle, id, days);
 }
 
+Future<void> saveLastMuscle(String muscle) async {
+  final repository = injector.get<LastMuscleRepository>();
+  await repository.saveLastMuscle(muscle);
+  selectedMuscle.value = muscle;
+}
+
+Future<void> getLastMuscle() async {
+  final repository = injector.get<LastMuscleRepository>();
+  selectedMuscle.value = await repository.getLastMuscle() ?? "";
+}

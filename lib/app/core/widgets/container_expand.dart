@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:registry_pull/app/interactor/actions/exercises_action.dart';
 import 'package:registry_pull/app/states/container_expand_viewmodel.dart';
 import 'package:registry_pull/app/core/widgets/list_date.dart';
 import 'package:registry_pull/app/core/widgets/list_series.dart';
@@ -92,7 +93,10 @@ class _ContainerExpandContent extends StatelessWidget {
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),
-              onPressed: viewModel.addNewDay,
+              onPressed: () {
+                viewModel.addNewDay();
+                saveLastMuscle(viewModel.exercise.nameMuscle);
+              },
               child: RichText(
                 text: TextSpan(
                   children: [
@@ -111,8 +115,8 @@ class _ContainerExpandContent extends StatelessWidget {
             if (viewModel.hasDays)
               IconButton(
                 onPressed: () async {
-                  final shouldDelete =
-                      await viewModel.showDeleteConfirmationDialog(context, loc);
+                  final shouldDelete = await viewModel
+                      .showDeleteConfirmationDialog(context, loc);
                   if (shouldDelete == true) {
                     await viewModel.removeLastDay();
                   }
@@ -173,8 +177,8 @@ class _ContainerExpandContent extends StatelessWidget {
                   ),
                 ),
                 onPressed: () async {
-                  final shouldDelete =
-                      await viewModel.showDeleteConfirmationDialog(context, loc);
+                  final shouldDelete = await viewModel
+                      .showDeleteConfirmationDialog(context, loc);
                   if (shouldDelete == true) {
                     await viewModel.removeLastSeries();
                   }
