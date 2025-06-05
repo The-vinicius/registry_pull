@@ -22,5 +22,6 @@
   "arms": "Arms",
   "chest": "Chest",
   "legs": "Legs",
-  "back": "Back"
+  "back": "Back",
+  "lastTraining": "Last training"
 }
