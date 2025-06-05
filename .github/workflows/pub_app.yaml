@@ -1,0 +1,15 @@
+name: "Flutter cli"
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  publish-play-store:
+    name: "Publish to Play Store"
+    uses: ./.github/workflows/publish_play_store.yaml
+    secrets:
+      ANDROID_STOREPASSWORD: ${{ secrets.ANDROID_STOREPASSWORD }}
+      ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
